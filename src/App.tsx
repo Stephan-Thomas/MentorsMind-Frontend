@@ -1,20 +1,35 @@
-import { useState } from 'react';
+import { lazy, useEffect, useState } from 'react';
 import SkipNavigation from './components/a11y/SkipNavigation';
 import LiveRegion from './components/a11y/LiveRegion';
 import AccessibilityPanel from './components/a11y/AccessibilityPanel';
-import MentorOnboarding from './components/onboarding/MentorOnboarding';
-import LearnerOnboarding from './pages/LearnerOnboarding';
-import MentorWallet from './pages/MentorWallet';
-import MentorSearch from './pages/MentorSearch';
-import RatingBreakdown from './components/reviews/RatingBreakdown';
-import ReviewForm from './components/reviews/ReviewForm';
-import ReviewList from './components/reviews/ReviewList';
+import LazyComponent from './components/performance/LazyComponent';
 import { useReviews } from './hooks/useReviews';
-import LineChart from './components/charts/LineChart';
-import BarChart from './components/charts/BarChart';
-import PieChart from './components/charts/PieChart';
-import AreaChart from './components/charts/AreaChart';
+import { usePerformance } from './hooks/usePerformance';
+import { preloadCriticalResources } from './utils/performance.utils';
 import MetricCard from './components/charts/MetricCard';
+const loadMentorOnboarding = () => import('./components/onboarding/MentorOnboarding');
+const loadLearnerOnboarding = () => import('./pages/LearnerOnboarding');
+const loadMentorWallet = () => import('./pages/MentorWallet');
+const loadMentorSearch = () => import('./pages/MentorSearch');
+const loadRatingBreakdown = () => import('./components/reviews/RatingBreakdown');
+const loadReviewForm = () => import('./components/reviews/ReviewForm');
+const loadReviewList = () => import('./components/reviews/ReviewList');
+const loadLineChart = () => import('./components/charts/LineChart');
+const loadBarChart = () => import('./components/charts/BarChart');
+const loadPieChart = () => import('./components/charts/PieChart');
+const loadAreaChart = () => import('./components/charts/AreaChart');
+
+const MentorOnboarding = lazy(loadMentorOnboarding);
+const LearnerOnboarding = lazy(loadLearnerOnboarding);
+const MentorWallet = lazy(loadMentorWallet);
+const MentorSearch = lazy(loadMentorSearch);
+const RatingBreakdown = lazy(loadRatingBreakdown);
+const ReviewForm = lazy(loadReviewForm);
+const ReviewList = lazy(loadReviewList);
+const LineChart = lazy(loadLineChart);
+const BarChart = lazy(loadBarChart);
+const PieChart = lazy(loadPieChart);
+const AreaChart = lazy(loadAreaChart);
 
 type AppView = 'onboarding' | 'learner' | 'wallet' | 'search' | 'reviews' | 'analytics';
 
@@ -108,6 +123,7 @@ function App() {
   const [showForm, setShowForm] = useState(false);
   const [a11yOpen, setA11yOpen] = useState(false);
   const [announcement, setAnnouncement] = useState('');
+  const { dashboard, budgetStatus } = usePerformance();
 
   const {
     reviews,
@@ -125,6 +141,19 @@ function App() {
   const handleViewChange = (next: AppView, label: string) => {
     setView(next);
     setAnnouncement(`Navigated to ${label}`);
+  };
+
+  useEffect(() => {
+    preloadCriticalResources();
+  }, []);
+
+  const preloaders: Record<AppView, () => Promise<unknown>> = {
+    search: loadMentorSearch,
+    learner: loadLearnerOnboarding,
+    onboarding: loadMentorOnboarding,
+    wallet: loadMentorWallet,
+    analytics: loadAreaChart,
+    reviews: loadReviewList,
   };
 
   return (
@@ -157,6 +186,8 @@ function App() {
                 key={item.id}
                 type="button"
                 onClick={() => handleViewChange(item.id as AppView, item.label)}
+                onMouseEnter={() => preloaders[item.id as AppView]?.()}
+                onFocus={() => preloaders[item.id as AppView]?.()}
                 className={`rounded-xl px-4 py-2 text-sm font-bold transition-all ${
                   view === item.id ? 'bg-white text-stellar shadow-sm' : 'text-gray-500 hover:text-gray-800'
                 }`}
@@ -186,12 +217,13 @@ function App() {
       </nav>
 
       <main id="main-content" tabIndex={-1} className="mx-auto max-w-7xl px-4 pt-10 outline-none">
-        {view === 'search' && <MentorSearch />}
-        {view === 'learner' && <LearnerOnboarding />}
-        {view === 'onboarding' && <MentorOnboarding />}
-        {view === 'wallet' && <MentorWallet />}
-        {view === 'analytics' && <AnalyticsDashboard />}
+        {view === 'search' && <LazyComponent><MentorSearch /></LazyComponent>}
+        {view === 'learner' && <LazyComponent><LearnerOnboarding /></LazyComponent>}
+        {view === 'onboarding' && <LazyComponent><MentorOnboarding /></LazyComponent>}
+        {view === 'wallet' && <LazyComponent><MentorWallet /></LazyComponent>}
+        {view === 'analytics' && <LazyComponent><AnalyticsDashboard /></LazyComponent>}
         {view === 'reviews' && (
+          <LazyComponent>
           <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex justify-between items-end">
               <div>
@@ -238,8 +270,26 @@ function App() {
               />
             </div>
           </div>
+          </LazyComponent>
         )}
       </main>
+
+      <aside className="fixed bottom-16 left-4 z-40 hidden w-72 rounded-[1.5rem] border border-gray-100 bg-white/95 p-4 shadow-xl backdrop-blur md:block">
+        <div className="text-xs font-bold uppercase tracking-[0.18em] text-stellar">Performance Monitor</div>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          {dashboard.map((item) => (
+            <div key={item.label} className="rounded-2xl bg-gray-50 p-3 text-center">
+              <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">{item.label}</div>
+              <div className="mt-1 text-sm font-black text-gray-900">
+                {item.value ?? '--'}{item.unit}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 text-[11px] text-gray-500">
+          Budget: {budgetStatus.jsBudgetKb}KB JS / {budgetStatus.chunkBudgetKb}KB chunks / {budgetStatus.imageBudgetKb}KB images
+        </div>
+      </aside>
 
       <footer className="fixed bottom-0 left-0 right-0 border-t border-gray-100 bg-white/80 py-4 text-center text-[10px] text-gray-400 backdrop-blur-sm">
         Demo Version 1.0 • Built with Vite, React & Tailwind CSS • Powered by Stellar
