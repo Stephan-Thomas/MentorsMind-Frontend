@@ -127,3 +127,13 @@
 /* ── Font Size Scaling ──────────────────────────────────────── */
 .font-large  { font-size: 112.5%; }
 .font-xlarge { font-size: 125%; }
+
+/* ── Animations ─────────────────────────────────────────────── */
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
