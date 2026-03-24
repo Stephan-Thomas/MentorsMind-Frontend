@@ -61,3 +61,172 @@ export interface SpendingAnalytics {
   bySkill: { skill: string; amount: number }[];
   monthlyTrend: { month: string; amount: number }[];
 }
+
+export type BookingSessionType = '1:1' | 'group' | 'workshop';
+
+export interface AvailabilitySlot {
+  id: string;
+  start: string;
+  end: string;
+  label: string;
+  dateLabel: string;
+  dateKey: string;
+  timezone: string;
+}
+
+export interface BookingDraft {
+  mentorId: string;
+  mentorName: string;
+  mentorAvatar?: string;
+  sessionType: BookingSessionType;
+  duration: number;
+  notes: string;
+  selectedSlot?: AvailabilitySlot;
+}
+
+export interface BookingPricingBreakdown {
+  hourlyRate: number;
+  duration: number;
+  baseAmount: number;
+  sessionTypeMultiplier: number;
+  sessionTypeFee: number;
+  platformFee: number;
+  totalAmount: number;
+  currency: string;
+}
+
+export interface CalendarInvite {
+  filename: string;
+  content: string;
+}
+
+export interface LearnerCalendarEvent {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  mentorName: string;
+  notes: string;
+  status: 'scheduled';
+}
+
+export interface BookingConfirmationDetails {
+  sessionId: string;
+  mentorId: string;
+  mentorName: string;
+  sessionType: BookingSessionType;
+  duration: number;
+  notes: string;
+  slot: AvailabilitySlot;
+  pricing: BookingPricingBreakdown;
+  calendarInvite: CalendarInvite;
+  learnerCalendarEvent: LearnerCalendarEvent;
+  paymentTransactionHash?: string;
+}
+
+export interface RecommendationReason {
+  title: string;
+  detail: string;
+}
+
+export interface SuccessStory {
+  learnerName: string;
+  startingPoint: string;
+  outcome: string;
+  timeframeWeeks: number;
+}
+
+export interface RecommendedMentor {
+  id: string;
+  name: string;
+  title: string;
+  avatar?: string;
+  matchScore: number;
+  hourlyRate: number;
+  currency: string;
+  skills: string[];
+  whyRecommended: RecommendationReason[];
+  successStory: SuccessStory;
+  estimatedWeeksToGoal: number;
+  feedback?: 'helpful' | 'not-helpful';
+  bookmarked: boolean;
+}
+
+export interface LearningPathStep {
+  id: string;
+  title: string;
+  description: string;
+  durationWeeks: number;
+  status: 'recommended' | 'in-progress' | 'next';
+  resources: string[];
+}
+
+export interface SkillRoadmapItem {
+  skill: string;
+  currentLevel: 'beginner' | 'intermediate' | 'advanced';
+  targetLevel: 'intermediate' | 'advanced' | 'expert';
+  progress: number;
+  milestone: string;
+}
+
+export interface RecommendedTopic {
+  id: string;
+  title: string;
+  type: 'topic' | 'course' | 'workshop';
+  duration: string;
+  reason: string;
+}
+
+export interface LearningPathRecommendation {
+  id: string;
+  title: string;
+  goal: string;
+  estimatedWeeks: number;
+  explanation: string;
+  steps: LearningPathStep[];
+  roadmap: SkillRoadmapItem[];
+  topics: RecommendedTopic[];
+  bookmarked: boolean;
+}
+
+export interface AgendaTemplateOption {
+  id: string;
+  title: string;
+  description: string;
+  agenda: string[];
+}
+
+export interface PrepChecklistItem {
+  id: string;
+  label: string;
+  checked: boolean;
+}
+
+export interface UploadedResource {
+  id: string;
+  name: string;
+  sizeLabel: string;
+  kind: 'document' | 'image' | 'link' | 'code';
+}
+
+export interface MentorResearchProfile {
+  mentorName: string;
+  specialties: string[];
+  recentFocus: string[];
+  sessionStyle: string;
+  responseTime: string;
+}
+
+export interface SessionPrepState {
+  selectedTemplateId: string;
+  goals: string;
+  objectives: string;
+  agendaNotes: string;
+  checklist: PrepChecklistItem[];
+  uploadedResources: UploadedResource[];
+  previousSessionNotes: string[];
+  reminderSummary: string;
+  timeManagementTips: string[];
+  mentorResearch: MentorResearchProfile;
+  progress: number;
+}
