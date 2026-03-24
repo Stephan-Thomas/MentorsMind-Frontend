@@ -166,4 +166,70 @@ export interface PaymentAnalytics {
   transactionCount: number;
 }
 
-export * from './pricing.types';
+// Mentor Search & Discovery Types
+export interface MentorProfile {
+  id: string;
+  name: string;
+  title: string;
+  bio: string;
+  avatar?: string;
+  hourlyRate: number;
+  currency: string;
+  rating: number;
+  reviewCount: number;
+  totalSessions: number;
+  completionRate: number;
+  skills: string[];
+  expertise: string[];
+  languages: string[];
+  availability: {
+    days: string[]; // e.g., ['Monday', 'Wednesday', 'Friday']
+    timeSlots: string[]; // e.g., ['9:00-12:00', '14:00-17:00']
+    timezone: string;
+  };
+  experienceYears: number;
+  certifications?: string[];
+  isAvailable: boolean;
+  responseTime?: string; // e.g., 'Within 2 hours'
+  joinedDate: string;
+}
+
+export interface SearchFilters {
+  searchQuery: string;
+  skills: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  minRating?: number;
+  availabilityDays: string[];
+  languages: string[];
+  sortBy: 'rating' | 'price_low' | 'price_high' | 'experience' | 'sessions';
+}
+
+export interface SearchResult {
+  mentors: MentorProfile[];
+  totalResults: number;
+  currentPage: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
+export interface RecentlyViewedMentor {
+  mentorId: string;
+  viewedAt: string;
+  mentor: MentorProfile;
+export type UserRole = 'mentor' | 'learner' | 'admin';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar?: string;
+  bio?: string;
+}
+
+export interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}
