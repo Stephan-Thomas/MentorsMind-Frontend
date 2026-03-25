@@ -9,6 +9,12 @@ export const setTokens = (access: string, refresh: string) => {
   refreshToken = refresh;
 };
 
+// Use to wait few seconds before retry
+const getBackOffDelay = (retry: number) => {
+  return Math.min(1000 * 2 ** retry, 10000); // capped at 10s
+};
+const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
 const api: AxiosInstance = axios.create({ baseURL: "/api", timeout: 10000 });
 const MAX_RETRIES = 3;
 
@@ -36,6 +42,10 @@ api.interceptors.response.use(
       originalReq._retry < MAX_RETRIES
     ) {
       originalReq._retry++;
+
+      // void immediate retry
+      await sleep(getBackOffDelay(originalReq._retry));
+
       return api(originalReq);
     }
 
