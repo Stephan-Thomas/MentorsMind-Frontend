@@ -16,4 +16,14 @@ export default class AuthService {
       data: { email, password },
     });
   }
+
+  async me() {
+    return request<{ id: string; email: string }>(
+      {
+        method: "GET",
+        url: "/auth/me",
+      },
+      true,
+    );
+  }
 }
