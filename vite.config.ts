@@ -1,7 +1,6 @@
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { PERFORMANCE_BUDGETS } from './src/utils/performance.utils';
-import tailwindcss from "@tailwindcss/vite";
 
 const performanceBudgetPlugin = (): Plugin => ({
   name: 'performance-budget-plugin',
@@ -19,7 +18,7 @@ const performanceBudgetPlugin = (): Plugin => ({
 });
 
 export default defineConfig({
-  plugins: [react(), performanceBudgetPlugin(), tailwindcss()],
+  plugins: [react(), performanceBudgetPlugin()],
   build: {
     cssCodeSplit: true,
     modulePreload: {

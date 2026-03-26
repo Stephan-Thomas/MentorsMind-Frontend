@@ -168,8 +168,13 @@ export interface OnboardingState {
 
 // ── Learning Goals ────────────────────────────────────────────────────────────
 
-export type GoalStatus = 'active' | 'completed' | 'paused' | 'overdue';
-export type GoalCategory = 'technical' | 'career' | 'project' | 'certification' | 'soft-skills';
+export type GoalStatus = "active" | "completed" | "paused" | "overdue";
+export type GoalCategory =
+  | "technical"
+  | "career"
+  | "project"
+  | "certification"
+  | "soft-skills";
 
 export interface Milestone {
   id: string;
@@ -212,7 +217,7 @@ export interface GoalTemplate {
   measurable: string;
   achievable: string;
   relevant: string;
-  milestones: Omit<Milestone, 'id' | 'completed' | 'completedAt'>[];
+  milestones: Omit<Milestone, "id" | "completed" | "completedAt">[];
 }
 
 export interface GoalStats {
@@ -222,8 +227,6 @@ export interface GoalStats {
   overdue: number;
   completionRate: number;
 }
-
-
 export type SessionStatus =
   | "pending"
   | "confirmed"
@@ -302,34 +305,6 @@ export interface PaymentAnalytics {
   transactionCount: number;
 }
 
-export type ReminderType = "email" | "sms" | "in-app" | "prep" | "calendar";
-export type ReminderStatus = "pending" | "sent" | "snoozed" | "cancelled";
-
-export interface ReminderSettings {
-  emailEnabled: boolean;
-  smsEnabled: boolean;
-  inAppEnabled: boolean;
-  customTimes: number[]; // minutes before session (e.g., 60, 1440)
-  sessionPrepReminders: boolean;
-  calendarSyncReminders: boolean;
-  mentorSpecificPreferences: Record<string, Partial<ReminderSettings>>;
-}
-
-export interface Reminder {
-  id: string;
-  sessionId: string;
-  type: ReminderType;
-  scheduledTime: string; // ISO date string
-  status: ReminderStatus;
-  snoozeCount: number;
-  lastSnoozedAt?: string;
-  message: string;
-}
-
-export interface ReminderHistoryItem extends Reminder {
-  sentAt: string;
-}
-
 // Mentor Search & Discovery Types
 export interface MentorProfile {
   id: string;
@@ -383,7 +358,7 @@ export interface RecentlyViewedMentor {
   mentor: MentorProfile;
 }
 
-export type UserRole = 'mentor' | 'learner' | 'admin';
+export type UserRole = "mentor" | "learner" | "admin";
 
 export interface User {
   id: string;
@@ -394,6 +369,10 @@ export interface User {
   bio?: string;
 }
 
+export interface User {
+  stellarPublicKey?: string;
+  emailVerified: boolean;
+}
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
@@ -435,10 +414,9 @@ export type {
   NoteTemplate,
   NoteAttachment,
   NoteVersion,
+  ResourceLink,
   BookmarkedResource,
   LearnerNote,
   FeedbackCategoryRatings,
-  SessionFeedbackEntry
+  SessionFeedbackEntry,
 } from "./session.types";
-
-export * from "./pricing.types";

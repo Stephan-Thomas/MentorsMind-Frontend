@@ -1,6 +1,6 @@
 import React from 'react';
 import { Filter, Sliders, Star, DollarSign, Calendar } from 'lucide-react';
-import type  { SearchFilters } from "../../services/search.service";
+import { SearchFilters } from '../../services/search.service';
 
 interface FilterPanelProps {
   filters: SearchFilters;
