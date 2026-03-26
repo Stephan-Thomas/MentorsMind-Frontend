@@ -69,10 +69,10 @@ const earningsData = [
 ];
 
 const sessionsByCategory = [
-  { label: 'Web Dev', value: 42 },
+  { label: 'Web Dev',    value: 42 },
   { label: 'Blockchain', value: 28 },
-  { label: 'Design', value: 18 },
-  { label: 'DevOps', value: 12 },
+  { label: 'Design',     value: 18 },
+  { label: 'DevOps',     value: 12 },
 ];
 
 const ratingTrend = [
@@ -84,19 +84,20 @@ const ratingTrend = [
   { label: 'Jun', rating: 4.8 },
 ];
 
+// ─── Analytics dashboard sub-page ────────────────────────────────────────────
 function AnalyticsDashboard() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
       <div>
-        <h2 className="text-3xl font-bold mb-1">Analytics</h2>
-        <p className="text-gray-500">Your platform metrics at a glance.</p>
+        <h2 className="text-3xl font-bold mb-1 text-gray-900 dark:text-gray-50">Analytics</h2>
+        <p className="text-gray-500 dark:text-gray-400">Your platform metrics at a glance.</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <MetricCard title="Total Earnings" value="$12,400" change={18.2} changeLabel="vs last month" prefix="" />
-        <MetricCard title="Sessions" value={84} change={12.5} changeLabel="vs last month" />
-        <MetricCard title="Avg. Rating" value="4.8" change={2.1} changeLabel="vs last month" suffix="★" />
-        <MetricCard title="Students" value={136} change={-3.4} changeLabel="vs last month" />
+        <MetricCard title="Total Earnings" value="$12,400" change={18.2}  changeLabel="vs last month" prefix="" />
+        <MetricCard title="Sessions"       value={84}       change={12.5}  changeLabel="vs last month" />
+        <MetricCard title="Avg. Rating"    value="4.8"      change={2.1}   changeLabel="vs last month" suffix="★" />
+        <MetricCard title="Students"       value={136}      change={-3.4}  changeLabel="vs last month" />
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -146,24 +147,17 @@ function AnalyticsDashboard() {
 
 function App() {
   const isOnline = useOnlineStatus();
-  const [view, setView] = useState<AppView>('onboarding');
-  const [showForm, setShowForm] = useState(false);
-  const [a11yOpen, setA11yOpen] = useState(false);
+  const [view, setView]               = useState<AppView>('onboarding');
+  const [showForm, setShowForm]       = useState(false);
+  const [a11yOpen, setA11yOpen]       = useState(false);
   const [announcement, setAnnouncement] = useState('');
   const [networkError, setNetworkError] = useState<string | null>(null);
   const { dashboard, budgetStatus } = usePerformance();
 
   const {
-    reviews,
-    stats,
-    addReview,
-    voteHelpful,
-    addMentorResponse,
-    filterRating,
-    setFilterRating,
-    currentPage,
-    totalPages,
-    paginate,
+    reviews, stats, addReview, voteHelpful,
+    addMentorResponse, filterRating, setFilterRating,
+    currentPage, totalPages, paginate,
   } = useReviews('m1');
 
   const handleViewChange = (next: AppView, label: string) => {
@@ -171,9 +165,7 @@ function App() {
     setAnnouncement(`Navigated to ${label}`);
   };
 
-  useEffect(() => {
-    preloadCriticalResources();
-  }, []);
+  useEffect(() => { preloadCriticalResources(); }, []);
 
   useEffect(() => {
     const handleNetworkError = (e: any) => {
@@ -213,15 +205,23 @@ function App() {
         <LiveRegion message={announcement} />
         <AccessibilityPanel isOpen={a11yOpen} onClose={() => setA11yOpen(false)} />
 
-        <nav id="main-nav" aria-label="Main navigation" className="sticky top-0 z-50 border-b border-gray-100 bg-white">
-          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-stellar font-bold text-white">
-                M
-              </div>
-              <span className="text-xl font-bold tracking-tight">
-                MentorMinds <span className="text-stellar">Stellar</span>
-              </span>
+      {/* ── Navbar ───────────────────────────────────────────────────────── */}
+      <nav
+        id="main-nav"
+        aria-label="Main navigation"
+        className={[
+          'sticky top-0 z-50 border-b',
+          'border-gray-100 bg-white',
+          'dark:border-gray-800 dark:bg-gray-900',
+          'transition-colors duration-300 ease-in-out',
+        ].join(' ')}
+      >
+        {/* Top bar */}
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-stellar font-bold text-white">
+              M
             </div>
 
             <div className="flex items-center gap-2 md:hidden">
