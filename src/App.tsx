@@ -19,6 +19,7 @@ const loadMentorSessions = () => import('./pages/MentorSessions');
 const loadSettings = () => import('./pages/Settings');
 const loadMentorProfileSetup = () => import('./pages/MentorProfileSetup');
 const loadLearningGoals = () => import('./pages/LearningGoals');
+const loadGovernance = () => import('./pages/Governance');
 const loadRatingBreakdown = () => import('./components/reviews/RatingBreakdown');
 const loadReviewForm = () => import('./components/reviews/ReviewForm');
 const loadReviewList = () => import('./components/reviews/ReviewList');
@@ -407,5 +408,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

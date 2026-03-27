@@ -9,6 +9,20 @@ import EarningsOverview from '../components/mentor/EarningsOverview';
 import PerformanceMetrics from '../components/mentor/PerformanceMetrics';
 import RecentReviews from '../components/mentor/RecentReviews';
 import ActivityFeed from '../components/mentor/ActivityFeed';
+import { useSessionCountdown } from '../hooks/useSessionCountdown';
+
+const POLL_INTERVAL_MS = 30_000;
+
+// Inner component so hooks can use session data
+const MentorDashboardInner: React.FC<{ nextSessionTime?: string }> = ({ nextSessionTime }) => {
+  const countdown = useSessionCountdown(nextSessionTime ?? new Date(0).toISOString());
+  return countdown.isStartingSoon && !countdown.isStarted && nextSessionTime ? (
+    <div className="flex items-center gap-3 px-5 py-3 mb-6 bg-amber-50 border border-amber-200 rounded-2xl text-amber-700 text-sm font-bold animate-in slide-in-from-top-2 duration-300">
+      <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse flex-shrink-0" />
+      Session starting soon — your next session begins in under 15 minutes.
+    </div>
+  ) : null;
+};
 
 const MentorDashboardContent: React.FC = () => {
   const {
@@ -21,6 +35,16 @@ const MentorDashboardContent: React.FC = () => {
 
   const { setRole, setLoading, widgets } = useDashboard();
   const [isAvailable, setIsAvailable] = useState(true);
+  const [lastPolled, setLastPolled] = useState<Date>(new Date());
+
+  // 30s polling indicator
+  useEffect(() => {
+    const interval = setInterval(() => setLastPolled(new Date()), POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, []);
+
+  const nextSession = data.upcomingSessions?.[0];
+  const nextSessionTime = nextSession?.startTime;
 
   useEffect(() => {
     setRole('mentor');

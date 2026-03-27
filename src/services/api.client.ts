@@ -1,10 +1,11 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import axios from "axios";
+import { initTokenRefresh } from "../utils/request.refresh.util";
 
 let accessToken: string;
 let refreshToken: string;
 
-export const setTokens = (access: string, refresh: string) => {
+const setTokens = (access: string, refresh: string) => {
   accessToken = access;
   refreshToken = refresh;
 };
@@ -32,10 +33,15 @@ const clearSlowTimer = () => {
 const startSlowTimer = () => {
   clearSlowTimer();
   slowNetworkTimer = setTimeout(() => {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('api-network-error', { 
-        detail: { message: 'The network is slow. Please wait while we process your request.' } 
-      }));
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("api-network-error", {
+          detail: {
+            message:
+              "The network is slow. Please wait while we process your request.",
+          },
+        }),
+      );
     }
   }, SLOW_THRESHOLD);
 };
@@ -69,8 +75,8 @@ const processQueue = async () => {
 };
 
 // Listen for online event to process queue
-if (typeof window !== 'undefined') {
-  window.addEventListener('online', processQueue);
+if (typeof window !== "undefined") {
+  window.addEventListener("online", processQueue);
 }
 
 api.interceptors.request.use((config) => {
@@ -78,13 +84,22 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
 
-  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
     if (config.method !== "get") {
-      requestQueue.push({ config, resolve: (val: any) => val, reject: (err: any) => err });
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('api-network-error', { 
-          detail: { message: 'You are offline. Your changes will be saved and synced once you reconnect.' } 
-        }));
+      requestQueue.push({
+        config,
+        resolve: (val: any) => val,
+        reject: (err: any) => err,
+      });
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("api-network-error", {
+            detail: {
+              message:
+                "You are offline. Your changes will be saved and synced once you reconnect.",
+            },
+          }),
+        );
       }
       return Promise.reject(new Error("OFFLINE"));
     }
@@ -100,23 +115,33 @@ api.interceptors.response.use(
   },
   async (error: AxiosError) => {
     clearSlowTimer();
-    const originalReq = error.config as AxiosRequestConfig & { _retry?: number };
+    const originalReq = error.config as AxiosRequestConfig & {
+      _retry?: number;
+    };
 
     // Detect network errors / offline
-    if (!error.response && (error.code === 'ERR_NETWORK' || (typeof navigator !== 'undefined' && !navigator.onLine))) {
-      if (originalReq.method !== 'get') {
+    if (
+      !error.response &&
+      (error.code === "ERR_NETWORK" ||
+        (typeof navigator !== "undefined" && !navigator.onLine))
+    ) {
+      if (originalReq.method !== "get") {
         return new Promise((resolve, reject) => {
           requestQueue.push({ config: originalReq, resolve, reject });
-          console.warn('Network error: Request added to offline queue');
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('api-network-error', { 
-              detail: { message: 'Network error occurred. The request has been queued.' } 
-            }));
+          console.warn("Network error: Request added to offline queue");
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(
+              new CustomEvent("api-network-error", {
+                detail: {
+                  message:
+                    "Network error occurred. The request has been queued.",
+                },
+              }),
+            );
           }
         });
       }
     }
-
 
     // Transient error retry (5xx)
     if (!originalReq._retry) {
@@ -155,5 +180,7 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-export default api;
 
+initTokenRefresh(api);
+
+export default api;
