@@ -6,8 +6,13 @@ import EarningsBreakdown from '../components/mentor/EarningsBreakdown';
 import PayoutRequest from '../components/mentor/PayoutRequest';
 import PayoutHistory from '../components/mentor/PayoutHistory';
 import MetricCard from '../components/charts/MetricCard';
+ feature/freighter-wallet-integration
+import { FreighterConnect } from '../components/wallet/FreighterConnect';
+import { FreighterConnect } from '../components/wallet/FreighterConnect';
+=======
 import EscrowStatus from '../components/payment/EscrowStatus';
 import EscrowTimeline from '../components/payment/EscrowTimeline';
+ main
 
 const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => {
   const {
@@ -41,6 +46,21 @@ const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => 
       <div>
         <h2 className="text-3xl font-bold mb-1">Wallet</h2>
         <p className="text-gray-500">Manage your Stellar earnings and payouts.</p>
+      </div>
+
+      {/* Wallet Connection Section */}
+      <div className="mb-6">
+        <FreighterConnect 
+          showNetworkIndicator={true}
+          onConnect={(walletInfo) => {
+            console.log('Wallet connected:', walletInfo);
+            // You can add additional logic here when wallet connects
+          }}
+          onDisconnect={() => {
+            console.log('Wallet disconnected');
+            // You can add additional logic here when wallet disconnects
+          }}
+        />
       </div>
 
       {/* Top row: wallet card + KPIs */}
