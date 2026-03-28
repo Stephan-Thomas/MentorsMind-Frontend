@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useMentorWallet } from '../hooks/useMentorWallet';
 import { useEscrow } from '../hooks/useEscrow';
+import { useAnchor } from '../hooks/useAnchor';
 import WalletDashboard from '../components/mentor/WalletDashboard';
 import EarningsBreakdown from '../components/mentor/EarningsBreakdown';
 import PayoutRequest from '../components/mentor/PayoutRequest';
 import PayoutHistory from '../components/mentor/PayoutHistory';
 import MetricCard from '../components/charts/MetricCard';
- feature/freighter-wallet-integration
 import { FreighterConnect } from '../components/wallet/FreighterConnect';
-import { FreighterConnect } from '../components/wallet/FreighterConnect';
-=======
+import { AnchorDeposit } from '../components/wallet/AnchorDeposit';
+import { AnchorWithdraw } from '../components/wallet/AnchorWithdraw';
+import { AnchorStatus } from '../components/wallet/AnchorStatus';
 import EscrowStatus from '../components/payment/EscrowStatus';
 import EscrowTimeline from '../components/payment/EscrowTimeline';
- main
 
 const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => {
   const {
@@ -26,6 +26,8 @@ const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => 
     copied, copyAddress,
     exportEarnings,
   } = useMentorWallet();
+
+  const anchor = useAnchor();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'escrow'>('overview');
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
@@ -61,6 +63,37 @@ const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => 
             // You can add additional logic here when wallet disconnects
           }}
         />
+      </div>
+
+      {/* Anchor on/off ramp section */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[420px_minmax(0,1fr)]">
+        <AnchorDeposit
+          anchorOptions={anchor.anchorOptions}
+          selectedAnchor={anchor.selectedAnchor}
+          amount={anchor.depositAmount}
+          onAmountChange={anchor.setDepositAmount}
+          onSelectAnchor={anchor.selectAnchor}
+          onDeposit={anchor.initiateDeposit}
+          depositStatus={anchor.depositStatus}
+          feeBreakdown={anchor.feeBreakdown}
+          estimatedArrival={anchor.selectedAnchorArrival}
+          onReset={anchor.resetDepositStatus}
+        />
+        <div className="space-y-6">
+          <AnchorWithdraw
+            selectedAnchor={anchor.selectedAnchor}
+            amount={anchor.withdrawAmount}
+            bankDetails={anchor.bankDetails}
+            onAmountChange={anchor.setWithdrawAmount}
+            onBankDetailChange={anchor.setBankDetail}
+            onWithdraw={anchor.initiateWithdraw}
+            status={anchor.withdrawStatus}
+            fee={anchor.withdrawFee}
+            total={anchor.withdrawTotal}
+            estimatedArrival={anchor.selectedAnchorArrival}
+          />
+          <AnchorStatus transactions={anchor.anchorHistory} />
+        </div>
       </div>
 
       {/* Top row: wallet card + KPIs */}
