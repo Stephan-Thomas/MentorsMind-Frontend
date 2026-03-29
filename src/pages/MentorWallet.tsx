@@ -16,15 +16,40 @@ import LimitWarningModal from '../components/compliance/LimitWarningModal';
 const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => {
   const {
     wallet,
-    txFilter, setTxFilter,
+    txFilter,
+    setTxFilter,
     filteredTx,
-    payoutAmount, setPayoutAmount,
-    payoutAsset, setPayoutAsset,
+    payoutAmount,
+    setPayoutAmount,
+    payoutAsset,
+    setPayoutAsset,
     payoutStatus,
     requestPayout,
-    copied, copyAddress,
+    copied,
+    copyAddress,
     exportEarnings,
   } = useMentorWallet();
+
+  const {
+    filters,
+    availableAssets,
+    availableTypes,
+    availableStatuses,
+    sortField,
+    sortDirection,
+    displayedTransactions,
+    pendingTransactions,
+    monthlyGroups,
+    hasMore,
+    updateFilters,
+    toggleType,
+    toggleStatus,
+    clearFilters,
+    setSort,
+    loadMore,
+    exportCsv,
+    downloadReceipt,
+  } = useTransactionHistory();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'escrow'>('overview');
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
@@ -149,6 +174,60 @@ const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => 
           />
         </div>
       </div>
+
+      <section className="space-y-6">
+        <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-stellar">Wallet history</p>
+              <h2 className="mt-1 text-2xl font-bold text-gray-900">Transaction dashboard</h2>
+            </div>
+            <button
+              type="button"
+              onClick={exportCsv}
+              className="rounded-3xl bg-stellar px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-stellar/20 hover:bg-stellar-dark"
+            >
+              Export CSV
+            </button>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+            <TransactionFilters
+              search={filters.search}
+              type={filters.type}
+              asset={filters.asset}
+              status={filters.status}
+              dateFrom={filters.dateFrom}
+              dateTo={filters.dateTo}
+              amountMin={filters.amountMin}
+              amountMax={filters.amountMax}
+              availableTypes={availableTypes}
+              availableAssets={availableAssets}
+              availableStatuses={availableStatuses}
+              onSearchChange={(value) => updateFilters({ search: value })}
+              onToggleType={toggleType}
+              onAssetChange={(value) => updateFilters({ asset: value })}
+              onToggleStatus={toggleStatus}
+              onDateFromChange={(value) => updateFilters({ dateFrom: value })}
+              onDateToChange={(value) => updateFilters({ dateTo: value })}
+              onAmountMinChange={(value) => updateFilters({ amountMin: value })}
+              onAmountMaxChange={(value) => updateFilters({ amountMax: value })}
+              onClear={clearFilters}
+            />
+            <TransactionList
+              pendingTransactions={pendingTransactions}
+              monthlyGroups={monthlyGroups}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+              onSelectTransaction={setSelectedTx}
+              onSort={setSort}
+              sortField={sortField}
+              sortDirection={sortDirection}
+              transactions={displayedTransactions}
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Tabs */}
       <div className="flex items-center gap-4 border-b border-gray-100 pb-2">

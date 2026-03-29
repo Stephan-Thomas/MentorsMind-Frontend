@@ -81,6 +81,14 @@ export default function MentorPublicProfile() {
     }
   };
 
+  const {
+    endorsements,
+    pendingSkill,
+    requestEndorsement,
+    cancelRequest,
+    toggleEndorsement,
+  } = useEndorsements(true);
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
       <div className="flex flex-wrap gap-3">
@@ -108,6 +116,16 @@ export default function MentorPublicProfile() {
         sessionCount={mentor.sessionCount}
         learnerCount={mentor.learnerCount}
         verified={mentor.verified}
+      />
+
+      <EndorsementSection
+        name={mentor.name}
+        endorsements={endorsements}
+        hasCompletedSession={true}
+        pendingSkill={pendingSkill}
+        onRequestEndorsement={requestEndorsement}
+        onToggleEndorsement={toggleEndorsement}
+        onCancelRequest={cancelRequest}
       />
 
       <RatingBreakdown />
