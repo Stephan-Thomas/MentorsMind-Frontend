@@ -12,6 +12,7 @@ import { useReviews } from './hooks/useReviews';
 import { usePerformance } from './hooks/usePerformance';
 import { preloadCriticalResources } from './utils/performance.utils';
 import MetricCard from './components/charts/MetricCard';
+import { ErrorBoundary } from './components/ui/ErrorBoundary'; // <-- Added import
 
 const loadMentorOnboarding = () => import('./components/onboarding/MentorOnboarding');
 const loadLearnerOnboarding = () => import('./pages/LearnerOnboarding');
@@ -95,6 +96,13 @@ const ratingTrend = [
 ];
 
 function AnalyticsDashboard() {
+  // Local fallback for individual widgets so one broken chart doesn't crash the whole page
+  const WidgetErrorFallback = (
+    <div className="flex items-center justify-center h-64 bg-red-50 border border-red-100 rounded-2xl text-sm text-red-600 font-medium">
+      Unable to load chart data.
+    </div>
+  );
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
       <div>
@@ -108,44 +116,52 @@ function AnalyticsDashboard() {
         <MetricCard title="Students" value={136} change={-3.4} changeLabel="vs last month" />
       </div>
       <div className="grid md:grid-cols-2 gap-6">
-        <AreaChart
-          data={earningsData}
-          series={[{ key: 'earnings', name: 'Earnings' }]}
-          title="Monthly Earnings"
-          description="Cumulative earnings over time"
-          xAxisKey="label"
-          valuePrefix="$"
-          exportable
-          exportFilename="earnings-chart"
-        />
-        <LineChart
-          data={ratingTrend}
-          series={[{ key: 'rating', name: 'Avg Rating' }]}
-          title="Rating Trend"
-          description="Average session rating per month"
-          xAxisKey="label"
-          zoomable
-          exportable
-          exportFilename="rating-trend"
-        />
+        <ErrorBoundary fallback={WidgetErrorFallback}>
+          <AreaChart
+            data={earningsData}
+            series={[{ key: 'earnings', name: 'Earnings' }]}
+            title="Monthly Earnings"
+            description="Cumulative earnings over time"
+            xAxisKey="label"
+            valuePrefix="$"
+            exportable
+            exportFilename="earnings-chart"
+          />
+        </ErrorBoundary>
+        <ErrorBoundary fallback={WidgetErrorFallback}>
+          <LineChart
+            data={ratingTrend}
+            series={[{ key: 'rating', name: 'Avg Rating' }]}
+            title="Rating Trend"
+            description="Average session rating per month"
+            xAxisKey="label"
+            zoomable
+            exportable
+            exportFilename="rating-trend"
+          />
+        </ErrorBoundary>
       </div>
       <div className="grid md:grid-cols-2 gap-6">
-        <BarChart
-          data={earningsData}
-          series={[{ key: 'sessions', name: 'Sessions' }]}
-          title="Sessions per Month"
-          xAxisKey="label"
-          exportable
-          exportFilename="sessions-bar"
-        />
-        <PieChart
-          data={sessionsByCategory}
-          title="Sessions by Category"
-          description="Proportional breakdown of session types"
-          donut
-          exportable
-          exportFilename="sessions-pie"
-        />
+        <ErrorBoundary fallback={WidgetErrorFallback}>
+          <BarChart
+            data={earningsData}
+            series={[{ key: 'sessions', name: 'Sessions' }]}
+            title="Sessions per Month"
+            xAxisKey="label"
+            exportable
+            exportFilename="sessions-bar"
+          />
+        </ErrorBoundary>
+        <ErrorBoundary fallback={WidgetErrorFallback}>
+          <PieChart
+            data={sessionsByCategory}
+            title="Sessions by Category"
+            description="Proportional breakdown of session types"
+            donut
+            exportable
+            exportFilename="sessions-pie"
+          />
+        </ErrorBoundary>
       </div>
     </div>
   );
@@ -176,7 +192,7 @@ function App() {
 
   const handleViewChange = (next: AppView, label: string) => {
     setView(next);
-    setAnnouncement(`Navigated to ${label}`);
+    setAnnouncement(`Mapsd to ${label}`);
   };
 
   useEffect(() => {
@@ -341,206 +357,209 @@ function App() {
           </div>
         )}
 
-        <Routes>
-          <Route
-            path="/dashboard"
-            element={
-              <Suspense fallback={fallback}>
-                <MentorDashboard />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/wallet"
-            element={
-              <Suspense fallback={fallback}>
-                <MentorWallet isOnline={isOnline} />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/search"
-            element={
-              <Suspense fallback={fallback}>
-                <MentorSearch isOnline={isOnline} />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/sessions"
-            element={
-              <Suspense fallback={fallback}>
-                <MentorSessions isOnline={isOnline} />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/mentor/analytics"
-            element={
-              <Suspense fallback={fallback}>
-                <MentorAnalyticsPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/learner/analytics"
-            element={
-              <Suspense fallback={fallback}>
-                <LearnerAnalyticsPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/stats"
-            element={
-              <Suspense fallback={fallback}>
-                <PlatformStatsPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/privacy"
-            element={
-              <Suspense fallback={fallback}>
-                <PrivacyPolicyPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/terms"
-            element={
-              <Suspense fallback={fallback}>
-                <TermsOfServicePage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <Suspense fallback={fallback}>
-                <Settings />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/mentors/:id"
-            element={
-              <Suspense fallback={fallback}>
-                <MentorPublicProfile />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/governance/proposals/:id"
-            element={
-              <Suspense fallback={fallback}>
-                <ProposalDetail />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/governance"
-            element={
-              <Suspense fallback={fallback}>
-                <Governance />
-              </Suspense>
-            }
-          />
-          <Route
-            path="*"
-            element={
-              <Suspense fallback={fallback}>
-                <>
-                  {view === 'settings' ? (
-                    <Settings />
-                  ) : view === 'onboarding' ? (
-                    <MentorOnboarding />
-                  ) : view === 'learner' ? (
-                    <LearnerOnboarding />
-                  ) : view === 'wallet' ? (
-                    <MentorWallet isOnline={isOnline} />
-                  ) : view === 'goals' ? (
-                    <LearningGoals />
-                  ) : view === 'sessions' ? (
-                    <MentorSessions isOnline={isOnline} />
-                  ) : view === 'profile' ? (
-                    <MentorProfileSetup />
-                  ) : view === 'search' ? (
-                    <MentorSearch isOnline={isOnline} />
-                  ) : view === 'analytics' ? (
-                    <AnalyticsDashboard />
-                  ) : view === 'dashboard' ? (
-                    <MentorDashboard />
-                  ) : view === 'learner-profile' ? (
-                    <LearnerProfile />
-                  ) : (
-                    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                      <div className="flex justify-between items-end">
-                        <div>
-                          <h2 className="text-3xl font-bold mb-2">
-                            Mentor Feedback
-                            {!isOnline && (
-                              <span className="ml-3 inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
-                                <svg className="mr-1.5 h-2 w-2 text-amber-400" fill="currentColor" viewBox="0 0 8 8">
-                                  <circle cx="4" cy="4" r="3" />
-                                </svg>
-                                Offline Cache
-                              </span>
-                            )}
-                          </h2>
-                          <p className="text-gray-500">See what the community is saying about your sessions.</p>
+        {/* --- GLOBAL ERROR BOUNDARY --- */}
+        <ErrorBoundary>
+          <Routes>
+            <Route
+              path="/dashboard"
+              element={
+                <Suspense fallback={fallback}>
+                  <MentorDashboard />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/wallet"
+              element={
+                <Suspense fallback={fallback}>
+                  <MentorWallet isOnline={isOnline} />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/search"
+              element={
+                <Suspense fallback={fallback}>
+                  <MentorSearch isOnline={isOnline} />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/sessions"
+              element={
+                <Suspense fallback={fallback}>
+                  <MentorSessions isOnline={isOnline} />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/mentor/analytics"
+              element={
+                <Suspense fallback={fallback}>
+                  <MentorAnalyticsPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/learner/analytics"
+              element={
+                <Suspense fallback={fallback}>
+                  <LearnerAnalyticsPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/stats"
+              element={
+                <Suspense fallback={fallback}>
+                  <PlatformStatsPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/privacy"
+              element={
+                <Suspense fallback={fallback}>
+                  <PrivacyPolicyPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/terms"
+              element={
+                <Suspense fallback={fallback}>
+                  <TermsOfServicePage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <Suspense fallback={fallback}>
+                  <Settings />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/mentors/:id"
+              element={
+                <Suspense fallback={fallback}>
+                  <MentorPublicProfile />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/governance/proposals/:id"
+              element={
+                <Suspense fallback={fallback}>
+                  <ProposalDetail />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/governance"
+              element={
+                <Suspense fallback={fallback}>
+                  <Governance />
+                </Suspense>
+              }
+            />
+            <Route
+              path="*"
+              element={
+                <Suspense fallback={fallback}>
+                  <>
+                    {view === 'settings' ? (
+                      <Settings />
+                    ) : view === 'onboarding' ? (
+                      <MentorOnboarding />
+                    ) : view === 'learner' ? (
+                      <LearnerOnboarding />
+                    ) : view === 'wallet' ? (
+                      <MentorWallet isOnline={isOnline} />
+                    ) : view === 'goals' ? (
+                      <LearningGoals />
+                    ) : view === 'sessions' ? (
+                      <MentorSessions isOnline={isOnline} />
+                    ) : view === 'profile' ? (
+                      <MentorProfileSetup />
+                    ) : view === 'search' ? (
+                      <MentorSearch isOnline={isOnline} />
+                    ) : view === 'analytics' ? (
+                      <AnalyticsDashboard />
+                    ) : view === 'dashboard' ? (
+                      <MentorDashboard />
+                    ) : view === 'learner-profile' ? (
+                      <LearnerProfile />
+                    ) : (
+                      <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex justify-between items-end">
+                          <div>
+                            <h2 className="text-3xl font-bold mb-2">
+                              Mentor Feedback
+                              {!isOnline && (
+                                <span className="ml-3 inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+                                  <svg className="mr-1.5 h-2 w-2 text-amber-400" fill="currentColor" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                  </svg>
+                                  Offline Cache
+                                </span>
+                              )}
+                            </h2>
+                            <p className="text-gray-500">See what the community is saying about your sessions.</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowForm(!showForm)}
+                            disabled={!isOnline}
+                            aria-expanded={showForm}
+                            aria-controls="review-form"
+                            className={`rounded-xl px-6 py-2.5 font-bold shadow-lg transition-all ${
+                              !isOnline
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                                : 'bg-stellar text-white shadow-stellar/20 hover:bg-stellar-dark'
+                            }`}
+                          >
+                            {showForm ? 'Cancel Review' : 'Write a Review'}
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setShowForm(!showForm)}
-                          disabled={!isOnline}
-                          aria-expanded={showForm}
-                          aria-controls="review-form"
-                          className={`rounded-xl px-6 py-2.5 font-bold shadow-lg transition-all ${
-                            !isOnline
-                              ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
-                              : 'bg-stellar text-white shadow-stellar/20 hover:bg-stellar-dark'
-                          }`}
-                        >
-                          {showForm ? 'Cancel Review' : 'Write a Review'}
-                        </button>
-                      </div>
 
-                      {showForm && (
-                        <div id="review-form">
-                          <ReviewForm
-                            onSubmit={(data) => {
-                              addReview({ ...data, reviewerId: `user-${Date.now()}` });
-                              setShowForm(false);
-                              setAnnouncement('Your review has been submitted.');
-                            }}
-                            onCancel={() => setShowForm(false)}
+                        {showForm && (
+                          <div id="review-form">
+                            <ReviewForm
+                              onSubmit={(data) => {
+                                addReview({ ...data, reviewerId: `user-${Date.now()}` });
+                                setShowForm(false);
+                                setAnnouncement('Your review has been submitted.');
+                              }}
+                              onCancel={() => setShowForm(false)}
+                            />
+                          </div>
+                        )}
+
+                        <RatingBreakdown stats={stats} />
+
+                        <div className="rounded-[2.5rem] border border-gray-100 bg-white p-8 shadow-sm md:p-12">
+                          <ReviewList
+                            reviews={reviews}
+                            stats={stats}
+                            onVoteHelpful={voteHelpful}
+                            onFilterChange={setFilterRating}
+                            currentFilter={filterRating}
+                            onAddResponse={addMentorResponse}
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={paginate}
                           />
                         </div>
-                      )}
-
-                      <RatingBreakdown stats={stats} />
-
-                      <div className="rounded-[2.5rem] border border-gray-100 bg-white p-8 shadow-sm md:p-12">
-                        <ReviewList
-                          reviews={reviews}
-                          stats={stats}
-                          onVoteHelpful={voteHelpful}
-                          onFilterChange={setFilterRating}
-                          currentFilter={filterRating}
-                          onAddResponse={addMentorResponse}
-                          currentPage={currentPage}
-                          totalPages={totalPages}
-                          onPageChange={paginate}
-                        />
                       </div>
-                    </div>
-                  )}
-                </>
-              </Suspense>
-            }
-          />
-        </Routes>
+                    )}
+                  </>
+                </Suspense>
+              }
+            />
+          </Routes>
+        </ErrorBoundary>
       </main>
 
       <aside className="fixed bottom-16 left-4 z-40 hidden w-72 rounded-[1.5rem] border border-gray-100 bg-white/95 p-4 shadow-xl backdrop-blur md:block">
