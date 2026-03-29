@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useMentorWallet } from '../hooks/useMentorWallet';
 import { useEscrow } from '../hooks/useEscrow';
+import { useTransactionLimits } from '../hooks/useTransactionLimits';
 import WalletDashboard from '../components/mentor/WalletDashboard';
 import EarningsBreakdown from '../components/mentor/EarningsBreakdown';
 import PayoutRequest from '../components/mentor/PayoutRequest';
@@ -9,11 +10,8 @@ import MetricCard from '../components/charts/MetricCard';
 import { FreighterConnect } from '../components/wallet/FreighterConnect';
 import EscrowStatus from '../components/payment/EscrowStatus';
 import EscrowTimeline from '../components/payment/EscrowTimeline';
-import { useTransactionHistory } from '../hooks/useTransactionHistory';
-import { TransactionFilters } from '../components/wallet/TransactionFilters';
-import { TransactionList } from '../components/wallet/TransactionList';
-import { TransactionDetail } from '../components/wallet/TransactionDetail';
-import type { PaymentTransaction } from '../types';
+import LimitUsage from '../components/compliance/LimitUsage';
+import LimitWarningModal from '../components/compliance/LimitWarningModal';
 
 const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => {
   const {
@@ -55,7 +53,16 @@ const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => 
 
   const [activeTab, setActiveTab] = useState<'overview' | 'escrow'>('overview');
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
-  const [selectedTx, setSelectedTx] = useState<PaymentTransaction | null>(null);
+  const [showLimitWarning, setShowLimitWarning] = useState(false);
+
+  const {
+    daily,
+    monthly,
+    tooltipText,
+    history,
+    kycUrl,
+    wouldExceedDailyLimit,
+  } = useTransactionLimits();
 
   // Escrow hook for mentor view
   const {
@@ -67,6 +74,20 @@ const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => 
     canDispute,
     isWithinDisputeWindow
   } = useEscrow({ userRole: 'mentor', userId: 'mentor-001' });
+
+  const payoutAmountValue = parseFloat(payoutAmount) || 0;
+
+  const handlePayoutSubmit = () => {
+    if (!isOnline) {
+      alert('Payouts are disabled while offline.');
+      return;
+    }
+    if (payoutAmountValue > 0 && wouldExceedDailyLimit(payoutAmountValue)) {
+      setShowLimitWarning(true);
+      return;
+    }
+    requestPayout();
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
@@ -121,6 +142,14 @@ const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => 
         </div>
       </div>
 
+      <LimitUsage
+        daily={daily}
+        monthly={monthly}
+        tooltipText={tooltipText}
+        history={history}
+        kycUrl={kycUrl}
+      />
+
       {/* Payout request + history */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
@@ -132,7 +161,7 @@ const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => 
             status={payoutStatus}
             onAmountChange={setPayoutAmount}
             onAssetChange={setPayoutAsset}
-            onSubmit={isOnline ? requestPayout : () => alert('Payouts are disabled while offline.')}
+            onSubmit={handlePayoutSubmit}
           />
 
         </div>
@@ -282,10 +311,13 @@ const MentorWallet: React.FC<{ isOnline?: boolean }> = ({ isOnline = true }) => 
           )}
         </div>
       )}
-      <TransactionDetail
-        transaction={selectedTx}
-        onClose={() => setSelectedTx(null)}
-        onDownloadReceipt={downloadReceipt}
+
+      <LimitWarningModal
+        isOpen={showLimitWarning}
+        amount={payoutAmountValue}
+        remaining={daily.remaining}
+        kycUrl={kycUrl}
+        onClose={() => setShowLimitWarning(false)}
       />
     </div>
   );

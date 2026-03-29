@@ -1,11 +1,13 @@
 import React, { lazy, useEffect, useState, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Link, useParams } from 'react-router-dom';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import OfflineBanner from './components/ui/OfflineBanner';
 import NetworkErrorToast from './components/ui/NetworkErrorToast';
 import SkipNavigation from './components/a11y/SkipNavigation';
 import LiveRegion from './components/a11y/LiveRegion';
 import AccessibilityPanel from './components/a11y/AccessibilityPanel';
+import CookieBanner from './components/compliance/CookieBanner';
+import TermsAcceptance from './components/compliance/TermsAcceptance';
 import { useReviews } from './hooks/useReviews';
 import { usePerformance } from './hooks/usePerformance';
 import { preloadCriticalResources } from './utils/performance.utils';
@@ -30,6 +32,13 @@ const loadPieChart = () => import('./components/charts/PieChart');
 const loadAreaChart = () => import('./components/charts/AreaChart');
 const loadMentorPublicProfile = () => import('./pages/MentorPublicProfile');
 const loadLearnerProfile = () => import('./pages/LearnerProfile');
+const loadMentorAnalyticsPage = () => import('./pages/MentorAnalytics');
+const loadLearnerAnalyticsPage = () => import('./pages/LearnerAnalytics');
+const loadPlatformStats = () => import('./pages/PlatformStats');
+const loadPrivacyPolicy = () => import('./pages/PrivacyPolicy');
+const loadTermsOfService = () => import('./pages/TermsOfService');
+const loadISAMarketplace = () => import('./pages/ISAMarketplace');
+const loadPortfolio = () => import('./pages/Portfolio');
 
 const MentorPublicProfile = lazy(loadMentorPublicProfile);
 const LearnerProfile = lazy(() => loadLearnerProfile().then(m => ({ default: m.LearnerProfilePage })));
@@ -51,6 +60,16 @@ const LineChart = lazy(loadLineChart);
 const BarChart = lazy(loadBarChart);
 const PieChart = lazy(loadPieChart);
 const AreaChart = lazy(loadAreaChart);
+const MentorAnalyticsPage = lazy(loadMentorAnalyticsPage);
+const LearnerAnalyticsPage = lazy(loadLearnerAnalyticsPage);
+const PlatformStatsPage = lazy(loadPlatformStats);
+const PrivacyPolicyPage = lazy(loadPrivacyPolicy);
+const TermsOfServicePage = lazy(loadTermsOfService);
+const ISAMarketplacePage = lazy(loadISAMarketplace);
+const Portfolio = lazy(loadPortfolio);
+
+const TERMS_ACCEPTANCE_KEY = 'mm_terms_acceptance';
+const UNSUPPORTED_COUNTRIES = new Set(['IR', 'KP', 'SY', 'CU']);
 
 type AppView = 'onboarding' | 'learner' | 'wallet' | 'search' | 'reviews' | 'analytics' | 'profile' | 'sessions' | 'settings' | 'goals' | 'dashboard' | 'learner-profile';
 
@@ -136,12 +155,26 @@ function AnalyticsDashboard() {
   );
 }
 
+function SessionJoinDeepLink() {
+  const { token } = useParams<{ token: string }>();
+
+  return (
+    <SessionRoom
+      sessionId={token ?? 'invite'}
+      sessionTopic="MentorMinds Session Invite"
+      mentorName="Mentor"
+    />
+  );
+}
+
 function App() {
   const isOnline = useOnlineStatus();
   const [view, setView] = useState<AppView>('onboarding');
   const [showForm, setShowForm] = useState(false);
   const [a11yOpen, setA11yOpen] = useState(false);
   const [announcement, setAnnouncement] = useState('');
+  const [termsAcceptedAt, setTermsAcceptedAt] = useState<string | null>(() => localStorage.getItem(TERMS_ACCEPTANCE_KEY));
+  const [geoRestriction, setGeoRestriction] = useState<{ countryName: string; countryCode: string } | null>(null);
   const { dashboard, budgetStatus } = usePerformance();
 
   const {
@@ -166,11 +199,34 @@ function App() {
     preloadCriticalResources();
   }, []);
 
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch('https://ipapi.co/json/', { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (!payload?.country_code) return;
+
+        if (UNSUPPORTED_COUNTRIES.has(payload.country_code)) {
+          setGeoRestriction({
+            countryName: payload.country_name ?? payload.country_code,
+            countryCode: payload.country_code,
+          });
+        }
+      })
+      .catch(() => {
+        // Ignore geo lookup failures and avoid blocking app usage.
+      });
+
+    return () => controller.abort();
+  }, []);
+
   const [networkError, setNetworkError] = useState<string | null>(null);
 
   useEffect(() => {
-    const handleNetworkError = (e: any) => {
-      setNetworkError(e.detail?.message || 'A network error occurred.');
+    const handleNetworkError = (event: Event) => {
+      const detail = (event as CustomEvent<{ message?: string }>).detail;
+      setNetworkError(detail?.message || 'A network error occurred.');
     };
     window.addEventListener('api-network-error', handleNetworkError);
     return () => window.removeEventListener('api-network-error', handleNetworkError);
@@ -194,6 +250,14 @@ function App() {
 
   return (
     <div className={`min-h-screen bg-gray-50 font-sans text-gray-900 pb-20 ${!isOnline ? 'pt-10' : ''}`}>
+      <TermsAcceptance
+        isOpen={!termsAcceptedAt}
+        onAccept={(acceptedAt) => {
+          localStorage.setItem(TERMS_ACCEPTANCE_KEY, acceptedAt);
+          setTermsAcceptedAt(acceptedAt);
+          setAnnouncement(`Terms accepted on ${new Date(acceptedAt).toLocaleString()}`);
+        }}
+      />
       <OfflineBanner />
       {networkError && (
         <NetworkErrorToast
@@ -287,7 +351,117 @@ function App() {
 
       {/* Main content area */}
       <main id="main-content" tabIndex={-1} className="max-w-7xl mx-auto px-4 pt-10 outline-none">
+        {geoRestriction && (
+          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
+            MentorMinds is not available in {geoRestriction.countryName} ({geoRestriction.countryCode}) at this time due to regional compliance requirements.
+          </div>
+        )}
+
         <Routes>
+          <Route
+            path="/dashboard"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorDashboard />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/wallet"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorWallet isOnline={isOnline} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/search"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorSearch isOnline={isOnline} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/sessions"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorSessions isOnline={isOnline} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/sessions/join/:token"
+            element={
+              <Suspense fallback={fallback}>
+                <SessionJoinDeepLink />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/mentor/analytics"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorAnalyticsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/learner/analytics"
+            element={
+              <Suspense fallback={fallback}>
+                <LearnerAnalyticsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/stats"
+            element={
+              <Suspense fallback={fallback}>
+                <PlatformStatsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/privacy"
+            element={
+              <Suspense fallback={fallback}>
+                <PrivacyPolicyPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/terms"
+            element={
+              <Suspense fallback={fallback}>
+                <TermsOfServicePage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <Suspense fallback={fallback}>
+                <Settings />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/isa-marketplace"
+            element={
+              <Suspense fallback={fallback}>
+                <ISAMarketplacePage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/portfolio"
+            element={
+              <Suspense fallback={fallback}>
+                <Portfolio />
+              </Suspense>
+            }
+          />
           <Route
             path="/mentors/:id"
             element={
@@ -426,9 +600,26 @@ function App() {
         </div>
       </aside>
 
-      <footer className="fixed bottom-0 left-0 right-0 border-t border-gray-100 bg-white/80 py-4 text-center text-[10px] text-gray-400 backdrop-blur-sm">
-        Demo Version 1.0 • Built with Vite, React & Tailwind CSS • Powered by Stellar
+      <CookieBanner />
+
+      <footer className="fixed bottom-0 left-0 right-0 border-t border-gray-100 bg-white/85 py-3 text-[10px] text-gray-500 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-1 px-4 md:flex-row">
+          <span>Demo Version 1.0 • Built with Vite, React & Tailwind CSS • Powered by Stellar</span>
+          <div className="flex items-center gap-3">
+            <Link to="/privacy" className="font-semibold text-gray-600 hover:text-stellar">Privacy Policy</Link>
+            <Link to="/terms" className="font-semibold text-gray-600 hover:text-stellar">Terms of Service</Link>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event('open-cookie-preferences'))}
+              className="font-semibold text-gray-600 hover:text-stellar"
+            >
+              Cookie Preferences
+            </button>
+          </div>
+        </div>
       </footer>
     </div>
   );
 }
+
+export default App;
