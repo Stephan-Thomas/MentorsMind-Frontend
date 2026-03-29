@@ -2,11 +2,14 @@ import React, { useEffect } from 'react';
 import { useReminders } from '../hooks/useReminders';
 import { useRecommendations } from '../hooks/useRecommendations';
 import { useDashboard } from '../hooks/useDashboard';
+import { useAuth } from '../hooks/useAuth';
+import { useOnboardingProgress } from '../hooks/useOnboardingProgress';
 import { usePostSessionReview } from '../hooks/usePostSessionReview';
 import { useAchievements } from '../hooks/useAchievements';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { DashboardGrid } from '../components/dashboard/DashboardGrid';
 import { Widget } from '../components/dashboard/Widget';
+import OnboardingChecklist from '../components/onboarding/OnboardingChecklist';
 import ReminderSettings from '../components/learner/ReminderSettings';
 import UpcomingReminders from '../components/learner/UpcomingReminders';
 import LearningRecommendations from '../components/learner/LearningRecommendations';
@@ -84,6 +87,13 @@ const LearnerDashboardContent: React.FC = () => {
   } = useRecommendations();
 
   const { setRole, setLoading, widgets } = useDashboard();
+  const { user } = useAuth();
+
+  // Initialize onboarding progress
+  const onboarding = useOnboardingProgress({
+    role: 'learner',
+    userCreatedAt: user?.createdAt,
+  });
 
   const {
     progress,
@@ -101,52 +111,24 @@ const LearnerDashboardContent: React.FC = () => {
     exportProgressCard,
     exportProgressReport,
     closeMilestoneModal,
-  } = useAchievements();
-
-  const { pendingSession, submitted, updatedRating, submitReview, dismissForNow, close } =
-    usePostSessionReview(MOCK_COMPLETED_SESSIONS);
-
-  useEffect(() => {
-    setRole('learner');
-    setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, [setRole, setLoading]);
-
-  return (
-    <div className="p-6 space-y-8">
-      {pendingSession && (
-        <PostSessionReview
-          session={pendingSession}
-          submitted={submitted}
-          updatedRating={updatedRating}
-          onSubmit={submitReview}
-          onDismiss={dismissForNow}
-          onClose={close}
+      {/* Onboarding Checklist Widget (merged) */}
+      {onboarding.shouldDisplay && (
+        <OnboardingChecklist
+          items={onboarding.items}
+          progressPercentage={onboarding.progressPercentage}
+          completedCount={onboarding.completedCount}
+          totalCount={onboarding.totalCount}
+          isDismissed={onboarding.isDismissed}
+          isCompleted={onboarding.isCompleted}
+          shouldDisplay={onboarding.shouldDisplay}
+          onMarkItemComplete={onboarding.markItemComplete}
+          onDismiss={onboarding.dismissWidget}
+          onResume={onboarding.resumeWidget}
+          onReset={onboarding.resetOnboarding}
+          role="learner"
+          userEmail={user?.email}
         />
       )}
-
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
-            Learner Dashboard
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2 font-medium">
-            You have {MOCK_SESSIONS.length} upcoming sessions this week.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <div className="bg-white dark:bg-gray-800 px-6 py-3 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-50 dark:bg-green-900/20 rounded-xl flex items-center justify-center text-green-500 font-bold">
-              128
-            </div>
-            <div className="text-xs">
-              <div className="font-bold text-gray-900 dark:text-white leading-none">XLM</div>
-              <div className="text-gray-400 dark:text-gray-500">Balance</div>
-            </div>
-          </div>
-        </div>
-      </header>
 
       <MilestoneModal
         visible={isMilestoneModalVisible}
@@ -208,6 +190,74 @@ const LearnerDashboardContent: React.FC = () => {
       <section>
         <AchievementBadges achievements={progress.achievements} onUnlock={unlockAchievement} />
       </section>
+
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-gray-900">Goal Progress</h3>
+          <p className="text-sm text-gray-500">Weekly goal and achievement completion.</p>
+          <div className="mt-4 flex items-center justify-center">
+            <ProgressRing value={achievementPercent} />
+          </div>
+          <div className="mt-4 flex flex-col gap-2">
+            <button
+              onClick={exportProgressCard}
+              className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700"
+            >
+              Export Progress Card
+            </button>
+            <button
+              onClick={exportProgressReport}
+              className="rounded-xl border border-blue-600 px-4 py-2 text-sm font-bold text-blue-600 hover:bg-blue-50"
+            >
+              Download Progress Report
+            </button>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-gray-900">Leaderboard</h3>
+            <span className="text-xs text-slate-400">Opt-in</span>
+          </div>
+          <div className="mt-4 flex items-center justify-between text-sm font-semibold">
+            <span>{isLeaderboardOptIn ? 'Enabled' : 'Disabled'}</span>
+            <button
+              onClick={toggleLeaderboardOptIn}
+              className={`rounded-lg px-3 py-1 text-xs font-bold ${
+                isLeaderboardOptIn
+                  ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              {isLeaderboardOptIn ? 'Opt Out' : 'Opt In'}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <AchievementBadges achievements={progress.achievements} onUnlock={unlockAchievement} />
+      </section>
+=======
+      {/* Onboarding Checklist Widget */}
+      {onboarding.shouldDisplay && (
+        <OnboardingChecklist
+          items={onboarding.items}
+          progressPercentage={onboarding.progressPercentage}
+          completedCount={onboarding.completedCount}
+          totalCount={onboarding.totalCount}
+          isDismissed={onboarding.isDismissed}
+          isCompleted={onboarding.isCompleted}
+          shouldDisplay={onboarding.shouldDisplay}
+          onMarkItemComplete={onboarding.markItemComplete}
+          onDismiss={onboarding.dismissWidget}
+          onResume={onboarding.resumeWidget}
+          onReset={onboarding.resetOnboarding}
+          role="learner"
+          userEmail={user?.email}
+        />
+      )}
+>>>>>>> ac9cb90 (Implement persistent onboarding checklist widget)
 
       <DashboardGrid>
         {widgets

@@ -279,7 +279,7 @@ export interface MentorDashboardData {
   pendingMessagesCount: number;
 }
 
-export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
+export type PaymentStatus = "pending" | "processing" | "completed" | "failed" | "refunded";
 
 export interface PaymentTransaction {
   id: string;
@@ -294,6 +294,9 @@ export interface PaymentTransaction {
   description: string;
   sessionId?: string;
   sessionTopic?: string;
+  transactionType?: "payment" | "escrow" | "swap" | "fee" | "staking";
+  memo?: string;
+  fee?: number;
 }
 
 export interface PaymentAnalytics {
@@ -367,12 +370,11 @@ export interface User {
   role: UserRole;
   avatar?: string;
   bio?: string;
-}
-
-export interface User {
   stellarPublicKey?: string;
   emailVerified: boolean;
+  createdAt?: string; // ISO date string
 }
+
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;

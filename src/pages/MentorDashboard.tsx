@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useMentorDashboard } from '../hooks/useMentorDashboard';
 import { useDashboard } from '../hooks/useDashboard';
+import { useAuth } from '../hooks/useAuth';
+import { useOnboardingProgress } from '../hooks/useOnboardingProgress';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { DashboardGrid } from '../components/dashboard/DashboardGrid';
 import { Widget } from '../components/dashboard/Widget';
+import OnboardingChecklist from '../components/onboarding/OnboardingChecklist';
 import UpcomingSessions from '../components/mentor/UpcomingSessions';
 import EarningsOverview from '../components/mentor/EarningsOverview';
 import PerformanceMetrics from '../components/mentor/PerformanceMetrics';
@@ -34,8 +37,15 @@ const MentorDashboardContent: React.FC = () => {
   } = useMentorDashboard();
 
   const { setRole, setLoading, widgets } = useDashboard();
+  const { user } = useAuth();
   const [isAvailable, setIsAvailable] = useState(true);
   const [lastPolled, setLastPolled] = useState<Date>(new Date());
+
+  // Initialize onboarding progress
+  const onboarding = useOnboardingProgress({
+    role: 'mentor',
+    userCreatedAt: user?.createdAt,
+  });
 
   // 30s polling indicator
   useEffect(() => {
@@ -87,6 +97,27 @@ const MentorDashboardContent: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Onboarding Checklist Widget */}
+      {onboarding.shouldDisplay && (
+        <div className="mb-8">
+          <OnboardingChecklist
+            items={onboarding.items}
+            progressPercentage={onboarding.progressPercentage}
+            completedCount={onboarding.completedCount}
+            totalCount={onboarding.totalCount}
+            isDismissed={onboarding.isDismissed}
+            isCompleted={onboarding.isCompleted}
+            shouldDisplay={onboarding.shouldDisplay}
+            onMarkItemComplete={onboarding.markItemComplete}
+            onDismiss={onboarding.dismissWidget}
+            onResume={onboarding.resumeWidget}
+            onReset={onboarding.resetOnboarding}
+            role="mentor"
+            userEmail={user?.email}
+          />
+        </div>
+      )}
 
       <DashboardGrid>
         {widgets.filter(w => w.visible).sort((a, b) => a.order - b.order).map(widget => (
