@@ -2,11 +2,14 @@ import React, { useEffect } from 'react';
 import { useReminders } from '../hooks/useReminders';
 import { useRecommendations } from '../hooks/useRecommendations';
 import { useDashboard } from '../hooks/useDashboard';
+import { useAuth } from '../hooks/useAuth';
+import { useOnboardingProgress } from '../hooks/useOnboardingProgress';
 import { usePostSessionReview } from '../hooks/usePostSessionReview';
 import { useAchievements } from '../hooks/useAchievements';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { DashboardGrid } from '../components/dashboard/DashboardGrid';
 import { Widget } from '../components/dashboard/Widget';
+import OnboardingChecklist from '../components/onboarding/OnboardingChecklist';
 import ReminderSettings from '../components/learner/ReminderSettings';
 import UpcomingReminders from '../components/learner/UpcomingReminders';
 import LearningRecommendations from '../components/learner/LearningRecommendations';
@@ -84,6 +87,13 @@ const LearnerDashboardContent: React.FC = () => {
   } = useRecommendations();
 
   const { setRole, setLoading, widgets } = useDashboard();
+  const { user } = useAuth();
+
+  // Initialize onboarding progress
+  const onboarding = useOnboardingProgress({
+    role: 'learner',
+    userCreatedAt: user?.createdAt,
+  });
 
   const {
     progress,

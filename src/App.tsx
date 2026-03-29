@@ -57,6 +57,14 @@ const LineChart = lazy(loadLineChart);
 const BarChart = lazy(loadBarChart);
 const PieChart = lazy(loadPieChart);
 const AreaChart = lazy(loadAreaChart);
+const MentorAnalyticsPage = lazy(loadMentorAnalyticsPage);
+const LearnerAnalyticsPage = lazy(loadLearnerAnalyticsPage);
+const PlatformStatsPage = lazy(loadPlatformStats);
+const PrivacyPolicyPage = lazy(loadPrivacyPolicy);
+const TermsOfServicePage = lazy(loadTermsOfService);
+
+const TERMS_ACCEPTANCE_KEY = 'mm_terms_acceptance';
+const UNSUPPORTED_COUNTRIES = new Set(['IR', 'KP', 'SY', 'CU']);
 
 type AppView =
   | "onboarding"
@@ -368,6 +376,86 @@ function App() {
       >
         <Routes>
           <Route
+            path="/dashboard"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorDashboard />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/wallet"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorWallet isOnline={isOnline} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/search"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorSearch isOnline={isOnline} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/sessions"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorSessions isOnline={isOnline} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/mentor/analytics"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorAnalyticsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/learner/analytics"
+            element={
+              <Suspense fallback={fallback}>
+                <LearnerAnalyticsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/stats"
+            element={
+              <Suspense fallback={fallback}>
+                <PlatformStatsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/privacy"
+            element={
+              <Suspense fallback={fallback}>
+                <PrivacyPolicyPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/terms"
+            element={
+              <Suspense fallback={fallback}>
+                <TermsOfServicePage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <Suspense fallback={fallback}>
+                <Settings />
+              </Suspense>
+            }
+          />
+          <Route
             path="/mentors/:id"
             element={
               <Suspense fallback={fallback}>
@@ -524,8 +612,23 @@ function App() {
         </div>
       </aside>
 
-      <footer className="fixed bottom-0 left-0 right-0 border-t border-gray-100 bg-white/80 py-4 text-center text-[10px] text-gray-400 backdrop-blur-sm">
-        Demo Version 1.0 • Built with Vite, React & Tailwind CSS • Powered by Stellar
+      <CookieBanner />
+
+      <footer className="fixed bottom-0 left-0 right-0 border-t border-gray-100 bg-white/85 py-3 text-[10px] text-gray-500 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-1 px-4 md:flex-row">
+          <span>Demo Version 1.0 • Built with Vite, React & Tailwind CSS • Powered by Stellar</span>
+          <div className="flex items-center gap-3">
+            <Link to="/privacy" className="font-semibold text-gray-600 hover:text-stellar">Privacy Policy</Link>
+            <Link to="/terms" className="font-semibold text-gray-600 hover:text-stellar">Terms of Service</Link>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event('open-cookie-preferences'))}
+              className="font-semibold text-gray-600 hover:text-stellar"
+            >
+              Cookie Preferences
+            </button>
+          </div>
+        </div>
       </footer>
     </div>
   );

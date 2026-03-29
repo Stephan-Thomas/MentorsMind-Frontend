@@ -367,12 +367,11 @@ export interface User {
   role: UserRole;
   avatar?: string;
   bio?: string;
-}
-
-export interface User {
   stellarPublicKey?: string;
   emailVerified: boolean;
+  createdAt?: string; // ISO date string
 }
+
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
