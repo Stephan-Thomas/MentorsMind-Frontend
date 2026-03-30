@@ -18,7 +18,6 @@ export interface UseStreakOptions {
 const WEEKS = 12;
 const DAYS = 7;
 
-/** [weekColumn][dayRow] heat — recent weeks brighter when `streakWeeks` > 0 */
 function mockHeatGrid(streakWeeks: number): HeatLevel[][] {
   return Array.from({ length: WEEKS }, (_, w) =>
     Array.from({ length: DAYS }, (_, d) => {
@@ -65,9 +64,7 @@ export function playStreakCelebrationSound(): void {
     gain.connect(ctx.destination);
     oscillator.start(ctx.currentTime);
     oscillator.stop(ctx.currentTime + 0.36);
-  } catch {
-    /* ignore audio failures */
-  }
+  } catch {}
 }
 
 export function useStreak(options: UseStreakOptions = {}) {

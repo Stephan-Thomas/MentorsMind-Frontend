@@ -6,7 +6,6 @@ interface MilestoneModalProps {
   visible: boolean;
   message?: string;
   onClose: () => void;
-  /** Confetti + short chime when opened (streak / reward celebrations) */
   withCelebration?: boolean;
 }
 

@@ -23,7 +23,6 @@ import MilestoneProgress from '../components/learner/MilestoneProgress';
 import PostSessionReview from '../components/session/PostSessionReview';
 import type { Session, SessionHistoryItem } from '../types';
 
-// Mock upcoming sessions
 const MOCK_SESSIONS: Session[] = [
   {
     id: 's1',
@@ -50,7 +49,6 @@ const MOCK_SESSIONS: Session[] = [
   },
 ];
 
-// Mock completed sessions eligible for post-session review (ended > 1 hour ago)
 const MOCK_COMPLETED_SESSIONS: SessionHistoryItem[] = [
   {
     id: 'cs1',

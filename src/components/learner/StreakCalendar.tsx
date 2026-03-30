@@ -2,7 +2,6 @@ import React, { useId } from 'react';
 import type { HeatLevel } from '../../hooks/useStreak';
 
 export interface StreakCalendarProps {
-  /** 12 columns (weeks) × 7 rows (Sun–Sat): heatGrid[week][day] */
   heatGrid: HeatLevel[][];
 }
 
