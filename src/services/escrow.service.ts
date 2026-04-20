@@ -6,7 +6,7 @@ import {
   nativeToScVal,
   Address,
   scValToNative,
-  SorobanRpc,
+  rpc as SorobanRpc,
 } from '@stellar/stellar-sdk';
 import { Horizon } from '@stellar/stellar-sdk';
 
