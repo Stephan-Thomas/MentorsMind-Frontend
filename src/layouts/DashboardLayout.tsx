@@ -6,6 +6,9 @@ import { useSwipeBack } from '../hooks/useSwipeBack';
 import { Sidebar } from '../components/dashboard/Sidebar';
 import { BottomTabBar, MENTOR_TABS, LEARNER_TABS } from '../components/navigation/BottomTabBar';
 import { HamburgerDrawer, SECONDARY_NAV_ITEMS } from '../components/navigation/HamburgerDrawer';
+import usePushNotifications from '../hooks/usePushNotifications';
+import { PermissionBanner } from '../components/notifications/PermissionBanner';
+import { DeniedTooltip } from '../components/notifications/DeniedTooltip';
 
 // Hamburger icon
 const HamburgerIcon = () => (
@@ -32,6 +35,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { isMobile } = useMobile();
   const { drawerOpen, openDrawer, closeDrawer, sidebarCollapsed, toggleSidebarCollapse } =
     useNavLayout();
+  const {
+    showBanner,
+    showDeniedTooltip,
+    requestPermission,
+    dismissBanner,
+    dismissDeniedTooltip,
+    isRegistering,
+    registrationError,
+  } = usePushNotifications();
 
   const { swipeProgress, containerProps } = useSwipeBack({ enabled: isMobile });
 
@@ -71,6 +83,17 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             <HamburgerIcon />
           </button>
         </header>
+
+        {/* Push notification banners — rendered above main content */}
+        {showBanner && (
+          <PermissionBanner
+            onEnable={requestPermission}
+            onDismiss={dismissBanner}
+            isLoading={isRegistering}
+            error={registrationError}
+          />
+        )}
+        {showDeniedTooltip && <DeniedTooltip onDismiss={dismissDeniedTooltip} />}
 
         {/* Main content — overscroll-behavior: contain prevents pull-to-refresh bleed;
             -webkit-overflow-scrolling: touch enables momentum scrolling on iOS (Req 8.6).
