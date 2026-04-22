@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   User, Bell, Shield, Palette, Globe, Link2, Clock,
-  CheckCircle, Loader2, ChevronRight, Wallet, Calendar, Download,
+  CheckCircle, Loader2, ChevronRight, Wallet, Calendar, Download, KeyRound,
 } from 'lucide-react';
 import { useSettings } from '../hooks/useSettings';
 import SanctionsError from '../components/compliance/SanctionsError';
@@ -9,6 +9,7 @@ import AccountSettings from '../components/settings/AccountSettings';
 import NotificationSettings from '../components/settings/NotificationSettings';
 import PrivacySettings from '../components/settings/PrivacySettings';
 import AppearanceSettings from '../components/settings/AppearanceSettings';
+import PasskeyManager from '../components/settings/PasskeyManager';
 
 type SettingsTab =
   | 'account'
@@ -17,12 +18,14 @@ type SettingsTab =
   | 'appearance'
   | 'localization'
   | 'connected'
-  | 'session';
+  | 'session'
+  | 'security';
 
 const TABS: { id: SettingsTab; label: string; icon: React.ReactNode }[] = [
   { id: 'account', label: 'Account', icon: <User className="w-4 h-4" /> },
   { id: 'notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
   { id: 'privacy', label: 'Privacy', icon: <Shield className="w-4 h-4" /> },
+  { id: 'security', label: 'Security', icon: <KeyRound className="w-4 h-4" /> },
   { id: 'appearance', label: 'Appearance', icon: <Palette className="w-4 h-4" /> },
   { id: 'localization', label: 'Language & Timezone', icon: <Globe className="w-4 h-4" /> },
   { id: 'connected', label: 'Connected Accounts', icon: <Link2 className="w-4 h-4" /> },
@@ -148,6 +151,9 @@ const Settings: React.FC = () => {
             onChange={updates => updateSettings('appearance', updates)}
           />
         );
+
+      case 'security':
+        return <PasskeyManager />;
 
       case 'localization':
         return (
