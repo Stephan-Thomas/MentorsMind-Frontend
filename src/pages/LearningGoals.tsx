@@ -3,6 +3,7 @@ import { useGoals } from '../hooks/useGoals';
 import GoalSetting from '../components/learner/GoalSetting';
 import GoalTemplates from '../components/learner/GoalTemplates';
 import MilestoneTracker from '../components/learner/MilestoneTracker';
+import EmptyState from '../components/ui/EmptyState';
 import type { Goal, GoalStatus, GoalCategory } from '../types';
 
 const STATUS_STYLES: Record<GoalStatus, string> = {
@@ -138,11 +139,13 @@ const LearningGoals: React.FC = () => {
 
       {/* Goal cards */}
       {filteredGoals.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-4xl mb-3">🎯</p>
-          <p className="font-semibold">No goals yet</p>
-          <p className="text-sm mt-1">Create a goal or pick a template to get started.</p>
-        </div>
+        <EmptyState
+          title="No goals yet"
+          description="Create a goal or pick a template to get started."
+          ctaLabel="Create goal"
+          onCta={() => setShowForm(true)}
+          illustration={<div className="text-4xl">🎯</div>}
+        />
       ) : (
         <div className="space-y-4">
           {filteredGoals.map((goal: Goal) => {

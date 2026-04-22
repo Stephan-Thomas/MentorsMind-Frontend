@@ -3,6 +3,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/navigation/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 import SkipNavigation from './components/a11y/SkipNavigation';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -22,7 +23,8 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <SkipNavigation />
-        <main id="main-content">
+        <ErrorBoundary>
+          <main id="main-content">
           <Routes>
             {/* Public */}
             <Route path="/" element={<LandingPage />} />
@@ -47,7 +49,8 @@ export default function App() {
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </main>
+          </main>
+        </ErrorBoundary>
       </BrowserRouter>
     </AuthProvider>
   );

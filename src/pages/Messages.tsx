@@ -3,6 +3,7 @@ import { useMessages } from '../hooks/useMessages';
 import ConversationList from '../components/messaging/ConversationList';
 import MessageThread from '../components/messaging/MessageThread';
 import MessageInput from '../components/messaging/MessageInput';
+import EmptyState from '../components/ui/EmptyState';
 
 const Messages: React.FC = () => {
   const {
@@ -17,6 +18,7 @@ const Messages: React.FC = () => {
     sendMessage,
     searchMessages,
     clearSearch,
+    createConversation,
   } = useMessages();
 
   const [isMobileView, setIsMobileView] = useState(false);
@@ -39,11 +41,20 @@ const Messages: React.FC = () => {
           <div className="grid md:grid-cols-[380px_1fr] h-[calc(100vh-220px)]">
             {/* Conversation List */}
             <div className={`border-r border-gray-100 ${activeConversationId ? 'hidden md:block' : 'block'}`}>
-              <ConversationList
-                conversations={conversations}
-                activeConversationId={activeConversationId}
-                onSelectConversation={selectConversation}
-              />
+              {conversations.length === 0 ? (
+                <EmptyState
+                  title="No conversations"
+                  description="You have no conversations yet. Start a chat with a mentor to get help."
+                  ctaLabel="Start a conversation"
+                  onCta={() => createConversation('mentor-demo', 'Mentor Demo')}
+                />
+              ) : (
+                <ConversationList
+                  conversations={conversations}
+                  activeConversationId={activeConversationId}
+                  onSelectConversation={selectConversation}
+                />
+              )}
             </div>
 
             {/* Message Thread */}

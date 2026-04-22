@@ -3,6 +3,7 @@ import MentorCard from '../components/mentor/MentorCard';
 import PaymentModal from '../components/payment/PaymentModal';
 import Input from '../components/ui/Input';
 import Badge from '../components/ui/Badge';
+import EmptyState from '../components/ui/EmptyState';
 import type { Mentor } from '../types';
 
 // Mock data
@@ -60,11 +61,13 @@ export default function MentorSearch() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <p className="text-sm text-gray-500 mb-6">{filtered.length} mentor{filtered.length !== 1 ? 's' : ''} found</p>
         {filtered.length === 0 ? (
-          <div className="text-center py-16 text-gray-400">
-            <p className="text-5xl mb-4">🔍</p>
-            <p className="text-lg font-medium">No mentors found</p>
-            <p className="text-sm mt-1">Try adjusting your filters</p>
-          </div>
+          <EmptyState
+            title="No mentors found"
+            description="Try adjusting your search or filters to find mentors."
+            ctaLabel="Clear filters"
+            onCta={() => { setQuery(''); setSelectedSkills([]); setMaxPrice(''); }}
+            illustration={<div className="text-5xl">🔍</div>}
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map(m => <MentorCard key={m.id} mentor={m} onBook={setBookingMentor} />)}
