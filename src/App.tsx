@@ -17,6 +17,8 @@ import LearnerProfile from './pages/LearnerProfile';
 import LearnerOnboarding from './pages/LearnerOnboarding';
 import SessionHistory from './pages/SessionHistory';
 import PaymentHistory from './pages/PaymentHistory';
+import MFAChallengeScreen from './pages/MFAChallengeScreen';
+import Settings from './pages/Settings';
 
 export default function App() {
   return (
@@ -30,20 +32,24 @@ export default function App() {
             <Route path="/mentors" element={<MentorSearch />} />
             <Route path="/onboarding/mentor" element={<MentorOnboarding />} />
             <Route path="/onboarding/learner" element={<LearnerOnboarding />} />
+            {/* MFA challenge — semi-public: requires mfaPending state in AuthContext */}
+            <Route path="/auth/mfa-challenge" element={<MFAChallengeScreen />} />
 
             {/* Mentor routes */}
-            <Route path="/mentor" element={<ProtectedRoute><ErrorBoundary><DashboardLayout><Navigate to="/mentor/dashboard" replace /></DashboardLayout></ErrorBoundary></ProtectedRoute>} />
-            <Route path="/mentor/dashboard" element={<ProtectedRoute><ErrorBoundary><DashboardLayout><MentorDashboard /></DashboardLayout></ErrorBoundary></ProtectedRoute>} />
-            <Route path="/mentor/profile" element={<ProtectedRoute><ErrorBoundary><DashboardLayout><MentorProfile /></DashboardLayout></ErrorBoundary></ProtectedRoute>} />
-            <Route path="/mentor/wallet" element={<ProtectedRoute><ErrorBoundary><DashboardLayout><MentorWallet /></DashboardLayout></ErrorBoundary></ProtectedRoute>} />
-            <Route path="/mentor/sessions" element={<ProtectedRoute><ErrorBoundary><DashboardLayout><SessionHistory /></DashboardLayout></ErrorBoundary></ProtectedRoute>} />
+            <Route path="/mentor" element={<ProtectedRoute><DashboardLayout><Navigate to="/mentor/dashboard" replace /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/mentor/dashboard" element={<ProtectedRoute><DashboardLayout><MentorDashboard /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/mentor/profile" element={<ProtectedRoute><DashboardLayout><MentorProfile /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/mentor/wallet" element={<ProtectedRoute><DashboardLayout><MentorWallet /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/mentor/sessions" element={<ProtectedRoute><DashboardLayout><SessionHistory /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/mentor/settings" element={<ProtectedRoute><DashboardLayout><Settings /></DashboardLayout></ProtectedRoute>} />
 
             {/* Learner routes */}
-            <Route path="/learner" element={<ProtectedRoute><ErrorBoundary><DashboardLayout><Navigate to="/learner/dashboard" replace /></DashboardLayout></ErrorBoundary></ProtectedRoute>} />
-            <Route path="/learner/dashboard" element={<ProtectedRoute><ErrorBoundary><DashboardLayout><LearnerDashboard /></DashboardLayout></ErrorBoundary></ProtectedRoute>} />
-            <Route path="/learner/profile" element={<ProtectedRoute><ErrorBoundary><DashboardLayout><LearnerProfile /></DashboardLayout></ErrorBoundary></ProtectedRoute>} />
-            <Route path="/learner/sessions" element={<ProtectedRoute><ErrorBoundary><DashboardLayout><SessionHistory /></DashboardLayout></ErrorBoundary></ProtectedRoute>} />
-            <Route path="/learner/payments" element={<ProtectedRoute><ErrorBoundary><DashboardLayout><PaymentHistory /></DashboardLayout></ErrorBoundary></ProtectedRoute>} />
+            <Route path="/learner" element={<ProtectedRoute><DashboardLayout><Navigate to="/learner/dashboard" replace /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/learner/dashboard" element={<ProtectedRoute><DashboardLayout><LearnerDashboard /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/learner/profile" element={<ProtectedRoute><DashboardLayout><LearnerProfile /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/learner/sessions" element={<ProtectedRoute><DashboardLayout><SessionHistory /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/learner/payments" element={<ProtectedRoute><DashboardLayout><PaymentHistory /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/learner/settings" element={<ProtectedRoute><DashboardLayout><Settings /></DashboardLayout></ProtectedRoute>} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
