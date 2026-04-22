@@ -32,12 +32,12 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+    <div className="min-h-screen flex items-center justify-center bg-surface px-4">
+      <div className="w-full max-w-md bg-background rounded-2xl shadow-lg p-8">
         <div className="text-center mb-8">
           <span className="text-4xl">⭐</span>
-          <h1 className="text-2xl font-bold text-gray-900 mt-2">Create your account</h1>
-          <p className="text-gray-500 text-sm mt-1">Join MentorMinds on Stellar</p>
+          <h1 className="text-2xl font-bold text-text mt-2">Create your account</h1>
+          <p className="text-muted-foreground text-sm mt-1">Join MentorMinds on Stellar</p>
         </div>
 
         {error && <Alert type="error" className="mb-4">{error}</Alert>}
@@ -48,11 +48,11 @@ export default function RegisterForm() {
           <Input label="Password" type="password" value={form.password} onChange={set('password')} placeholder="Min. 8 characters" required />
 
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">I want to</label>
+            <label className="text-sm font-medium text-text">I want to</label>
             <div className="grid grid-cols-2 gap-3">
               {(['learner', 'mentor'] as const).map(r => (
                 <label key={r} className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 cursor-pointer transition-colors
-                  ${form.role === r ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 hover:border-gray-300'}`}>
+                  ${form.role === r ? 'border-primary bg-accent text-accent-foreground' : 'border-border hover:border-border/80'}`}>
                   <input type="radio" name="role" value={r} checked={form.role === r} onChange={set('role')} className="sr-only" />
                   <span>{r === 'learner' ? '🎓 Learn' : '👨‍🏫 Mentor'}</span>
                 </label>
@@ -63,9 +63,9 @@ export default function RegisterForm() {
           <Button type="submit" loading={loading} className="w-full">Create Account</Button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-muted-foreground mt-6">
           Already have an account?{' '}
-          <Link to="/login" className="text-indigo-600 font-medium hover:underline">Sign in</Link>
+          <Link to="/login" className="text-primary font-medium hover:underline">Sign in</Link>
         </p>
       </div>
     </div>

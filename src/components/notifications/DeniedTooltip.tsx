@@ -48,13 +48,13 @@ export const DeniedTooltip: React.FC<DeniedTooltipProps> = ({ onDismiss }) => {
       aria-labelledby="denied-tooltip-title"
     >
       <div
-        className="relative bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6 animate-in zoom-in-95 duration-200"
+        className="relative bg-background rounded-2xl shadow-xl w-full max-w-md mx-4 p-6 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
         <button
           onClick={onDismiss}
-          className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+          className="absolute top-4 right-4 p-1.5 text-muted-foreground hover:text-text hover:bg-surface rounded-full transition-colors"
           aria-label="Close"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
@@ -65,7 +65,7 @@ export const DeniedTooltip: React.FC<DeniedTooltipProps> = ({ onDismiss }) => {
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-4 pr-8">
-          <span className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 text-amber-600">
+          <span className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -81,10 +81,10 @@ export const DeniedTooltip: React.FC<DeniedTooltipProps> = ({ onDismiss }) => {
             </svg>
           </span>
           <div>
-            <h2 id="denied-tooltip-title" className="text-base font-semibold text-gray-900">
+            <h2 id="denied-tooltip-title" className="text-base font-semibold text-text">
               Notifications blocked
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Re-enable them in your browser settings.
             </p>
           </div>
@@ -99,23 +99,23 @@ export const DeniedTooltip: React.FC<DeniedTooltipProps> = ({ onDismiss }) => {
                 key={browser}
                 className={`rounded-xl border px-4 py-3 transition-colors ${
                   isActive
-                    ? 'border-blue-300 bg-blue-50'
-                    : 'border-gray-200 bg-gray-50 opacity-50'
+                    ? 'border-primary bg-accent'
+                    : 'border-border bg-surface opacity-50'
                 }`}
               >
                 <p
                   className={`text-xs font-semibold uppercase tracking-wide mb-1 ${
-                    isActive ? 'text-blue-600' : 'text-gray-400'
+                    isActive ? 'text-primary' : 'text-muted-foreground'
                   }`}
                 >
                   {browser}
                   {isActive && (
-                    <span className="ml-2 normal-case font-medium text-blue-500">
+                    <span className="ml-2 normal-case font-medium text-primary/80">
                       (your browser)
                     </span>
                   )}
                 </p>
-                <p className={`text-sm ${isActive ? 'text-gray-800' : 'text-gray-500'}`}>
+                <p className={`text-sm ${isActive ? 'text-text' : 'text-muted-foreground'}`}>
                   {steps}
                 </p>
               </div>
@@ -126,7 +126,7 @@ export const DeniedTooltip: React.FC<DeniedTooltipProps> = ({ onDismiss }) => {
         {/* Dismiss button */}
         <button
           onClick={onDismiss}
-          className="mt-5 w-full rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          className="mt-5 w-full rounded-full border border-border px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-surface"
         >
           Got it
         </button>

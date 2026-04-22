@@ -28,20 +28,20 @@ export default function FileUpload({ label, accept, maxSizeMB = 5, onFile, error
 
   return (
     <div className="space-y-1">
-      {label && <label className="block text-sm font-medium text-gray-700">{label}</label>}
+      {label && <label className="block text-sm font-medium text-text">{label}</label>}
       <div
         onClick={() => ref.current?.click()}
         onDragOver={e => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={e => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) handle(f); }}
         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
-          ${dragOver ? 'border-indigo-400 bg-indigo-50' : 'border-gray-300 hover:border-gray-400'}`}
+          ${dragOver ? 'border-primary bg-accent' : 'border-border hover:border-primary/50'}`}
       >
-        <p className="text-sm text-gray-500">{fileName || 'Drop file here or click to browse'}</p>
-        <p className="text-xs text-gray-400 mt-1">Max {maxSizeMB}MB</p>
+        <p className="text-sm text-muted-foreground">{fileName || 'Drop file here or click to browse'}</p>
+        <p className="text-xs text-muted-foreground/70 mt-1">Max {maxSizeMB}MB</p>
       </div>
       <input ref={ref} type="file" accept={accept} className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handle(f); }} />
-      {displayError && <p className="text-xs text-red-600">{displayError}</p>}
+      {displayError && <p className="text-xs text-destructive">{displayError}</p>}
     </div>
   );
 }

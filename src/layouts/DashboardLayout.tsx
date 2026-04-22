@@ -53,7 +53,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     // Root container: min-h uses 100dvh (avoids iOS Safari 100vh bug) with -webkit-fill-available fallback.
     // overflow-x: hidden prevents any child from causing horizontal scroll (Req 7.2, 8.1).
     <div
-      className="flex bg-gray-50 overflow-x-hidden"
+      className="flex bg-surface overflow-x-hidden"
       style={{ minHeight: '-webkit-fill-available' }}
       data-testid="dashboard-layout-root"
       {...containerProps}
@@ -72,12 +72,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       {/* Page body */}
       <div className="flex flex-col flex-1 min-w-0">
         {/* Mobile top header — visible only on mobile (Req 3.1) */}
-        <header className="flex md:hidden items-center justify-between h-14 px-4 bg-white border-b border-gray-200 shrink-0">
-          <span className="font-bold text-indigo-600">⭐ MentorMinds</span>
+        <header className="flex md:hidden items-center justify-between h-14 px-4 bg-background border-b border-border shrink-0">
+          <span className="font-bold text-primary">⭐ MentorMinds</span>
           <button
             onClick={openDrawer}
             aria-label="Open navigation menu"
-            className="p-2.5 rounded-lg hover:bg-gray-100 text-gray-600 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="p-2.5 rounded-lg hover:bg-surface text-muted-foreground min-w-[44px] min-h-[44px] flex items-center justify-center"
             data-testid="hamburger-button"
           >
             <HamburgerIcon />

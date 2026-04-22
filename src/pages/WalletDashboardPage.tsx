@@ -29,8 +29,8 @@ export default function WalletDashboardPage({ publicKey, nickname }: WalletDashb
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Wallet</h2>
-        <p className="text-sm text-gray-500 mt-1">Stellar account overview</p>
+        <h2 className="text-2xl font-bold text-text">Wallet</h2>
+        <p className="text-sm text-muted-foreground mt-1">Stellar account overview</p>
       </div>
 
       <KYCStatusBanner
