@@ -56,7 +56,7 @@ const DEFAULT_SANCTIONED_WALLETS = [
   'GSANCTIONSDEMO0000000000000000000000000000000000000000000000000000',
 ];
 
-const selectClass = 'w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-stellar/30 focus:border-stellar bg-white';
+const selectClass = 'w-full px-3 py-2 border border-border rounded-xl text-sm bg-background text-text focus:outline-none focus:ring-2 focus:ring-stellar/30 focus:border-stellar';
 
 function isSanctionedWallet(address: string) {
   const normalized = address.trim().toUpperCase();
@@ -127,11 +127,11 @@ const Settings: React.FC = () => {
               onChange={updates => updateSettings('privacy', updates)}
             />
 
-            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5">
+            <div className="rounded-2xl border border-border bg-surface p-5">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">GDPR data portability</p>
-                  <p className="mt-1 text-sm text-gray-500">Export my data as a JSON archive with settings, consent timestamps, and connected account metadata.</p>
+                  <p className="text-sm font-semibold text-text">GDPR data portability</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Export my data as a JSON archive with settings, consent timestamps, and connected account metadata.</p>
                 </div>
                 <button
                   onClick={handleExportMyData}
@@ -166,7 +166,7 @@ const Settings: React.FC = () => {
         return (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Language</label>
+              <label className="block text-sm font-semibold text-text mb-2">Language</label>
               <select
                 value={settings.session.language}
                 onChange={e => updateSettings('session', { language: e.target.value })}
@@ -178,7 +178,7 @@ const Settings: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Timezone</label>
+              <label className="block text-sm font-semibold text-text mb-2">Timezone</label>
               <select
                 value={settings.session.timezone}
                 onChange={e => updateSettings('session', { timezone: e.target.value })}
@@ -188,7 +188,7 @@ const Settings: React.FC = () => {
                   <option key={tz} value={tz}>{tz.replace('_', ' ')}</option>
                 ))}
               </select>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Current time: {new Date().toLocaleTimeString('en-US', { timeZone: settings.session.timezone })} ({settings.session.timezone})
               </p>
             </div>
@@ -199,17 +199,17 @@ const Settings: React.FC = () => {
         return (
           <div className="space-y-6">
             {/* Stellar Wallet */}
-            <div className="p-5 border border-gray-200 rounded-2xl space-y-3">
+            <div className="p-5 border border-border rounded-2xl space-y-3">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-stellar/10 rounded-xl flex items-center justify-center">
                   <Wallet className="w-4 h-4 text-stellar" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Stellar Wallet</p>
-                  <p className="text-xs text-gray-400">Connect your Stellar public key for payments</p>
+                  <p className="text-sm font-semibold text-text">Stellar Wallet</p>
+                  <p className="text-xs text-muted-foreground">Connect your Stellar public key for payments</p>
                 </div>
                 {settings.connected.stellarWallet && (
-                  <span className="ml-auto text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg">Connected</span>
+                  <span className="ml-auto text-xs font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded-lg">Connected</span>
                 )}
               </div>
               <input
@@ -223,14 +223,14 @@ const Settings: React.FC = () => {
                 <button
                   onClick={() => updateSettings('connected', { stellarWallet: walletInput || null })}
                   disabled={walletFlagged}
-                  className="px-4 py-2 bg-stellar text-white text-sm font-semibold rounded-xl hover:bg-stellar-dark transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
+                  className="px-4 py-2 bg-stellar text-white text-sm font-semibold rounded-xl hover:bg-stellar-dark transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {settings.connected.stellarWallet ? 'Update' : 'Connect'}
                 </button>
                 {settings.connected.stellarWallet && (
                   <button
                     onClick={() => { setWalletInput(''); updateSettings('connected', { stellarWallet: null }); }}
-                    className="px-4 py-2 border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 border border-border text-muted-foreground text-sm font-semibold rounded-xl hover:bg-surface transition-colors"
                   >
                     Disconnect
                   </button>
@@ -240,17 +240,17 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Calendar Sync */}
-            <div className="p-5 border border-gray-200 rounded-2xl space-y-3">
+            <div className="p-5 border border-border rounded-2xl space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center">
-                  <Calendar className="w-4 h-4 text-blue-500" />
+                <div className="w-9 h-9 bg-accent rounded-xl flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Calendar Sync</p>
-                  <p className="text-xs text-gray-400">Sync sessions with your calendar</p>
+                  <p className="text-sm font-semibold text-text">Calendar Sync</p>
+                  <p className="text-xs text-muted-foreground">Sync sessions with your calendar</p>
                 </div>
                 {settings.connected.calendarSync && (
-                  <span className="ml-auto text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg">Synced</span>
+                  <span className="ml-auto text-xs font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded-lg">Synced</span>
                 )}
               </div>
               {!settings.connected.calendarSync ? (
@@ -259,7 +259,7 @@ const Settings: React.FC = () => {
                     <button
                       key={provider}
                       onClick={() => updateSettings('connected', { calendarSync: true, calendarProvider: provider })}
-                      className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 capitalize transition-colors"
+                      className="flex-1 px-4 py-2 border border-border text-text text-sm font-semibold rounded-xl hover:bg-surface capitalize transition-colors"
                     >
                       {provider === 'google' ? 'Google Calendar' : 'Outlook'}
                     </button>
@@ -267,12 +267,12 @@ const Settings: React.FC = () => {
                 </div>
               ) : (
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-600 capitalize">
+                  <p className="text-sm text-muted-foreground capitalize">
                     Connected to {settings.connected.calendarProvider} Calendar
                   </p>
                   <button
                     onClick={() => updateSettings('connected', { calendarSync: false, calendarProvider: null })}
-                    className="text-sm text-red-500 hover:text-red-600 font-semibold"
+                    className="text-sm text-destructive hover:opacity-80 font-semibold"
                   >
                     Disconnect
                   </button>
@@ -286,7 +286,7 @@ const Settings: React.FC = () => {
         return (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Default Session Duration</label>
+              <label className="block text-sm font-semibold text-text mb-2">Default Session Duration</label>
               <div className="grid grid-cols-3 gap-2">
                 {DURATIONS.map(d => (
                   <button
@@ -295,7 +295,7 @@ const Settings: React.FC = () => {
                     className={`py-2.5 rounded-xl text-sm font-semibold border-2 transition-all ${
                       settings.session.defaultDuration === d
                         ? 'border-stellar bg-stellar/5 text-stellar'
-                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                        : 'border-border text-muted-foreground hover:border-primary/50'
                     }`}
                   >
                     {d} min
@@ -305,8 +305,8 @@ const Settings: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Buffer Time Between Sessions</label>
-              <p className="text-xs text-gray-400 mb-3">Time blocked after each session ends</p>
+              <label className="block text-sm font-semibold text-text mb-2">Buffer Time Between Sessions</label>
+              <p className="text-xs text-muted-foreground mb-3">Time blocked after each session ends</p>
               <div className="grid grid-cols-5 gap-2">
                 {BUFFERS.map(b => (
                   <button
@@ -315,7 +315,7 @@ const Settings: React.FC = () => {
                     className={`py-2.5 rounded-xl text-sm font-semibold border-2 transition-all ${
                       settings.session.bufferTime === b
                         ? 'border-stellar bg-stellar/5 text-stellar'
-                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                        : 'border-border text-muted-foreground hover:border-primary/50'
                     }`}
                   >
                     {b === 0 ? 'None' : `${b}m`}
@@ -332,8 +332,8 @@ const Settings: React.FC = () => {
     <div className="max-w-5xl mx-auto px-4 py-8 animate-in fade-in duration-500">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Settings</h1>
-        <p className="text-gray-500 mt-1">Manage your account, preferences, and privacy.</p>
+        <h1 className="text-3xl font-black text-text tracking-tight">Settings</h1>
+        <p className="text-muted-foreground mt-1">Manage your account, preferences, and privacy.</p>
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
@@ -347,7 +347,7 @@ const Settings: React.FC = () => {
                   className={`w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                     activeTab === tab.id
                       ? 'bg-stellar text-white shadow-sm shadow-stellar/20'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      : 'text-muted-foreground hover:bg-surface'
                   }`}
                 >
                   <span className="flex items-center gap-3">
@@ -363,18 +363,18 @@ const Settings: React.FC = () => {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 md:p-8">
+          <div className="bg-background rounded-3xl border border-border shadow-sm p-6 md:p-8">
             {/* Section header */}
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-gray-900">
+              <h2 className="text-lg font-bold text-text">
                 {TABS.find(t => t.id === activeTab)?.label}
               </h2>
               {/* Save status indicator */}
               {saveStatus !== 'idle' && (
                 <div className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-all ${
-                  saveStatus === 'saving' ? 'bg-gray-100 text-gray-500' :
-                  saveStatus === 'saved' ? 'bg-green-50 text-green-600' :
-                  'bg-red-50 text-red-500'
+                  saveStatus === 'saving' ? 'bg-surface text-muted-foreground' :
+                  saveStatus === 'saved' ? 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400' :
+                  'bg-destructive/10 text-destructive'
                 }`}>
                   {saveStatus === 'saving' && <Loader2 className="w-3 h-3 animate-spin" />}
                   {saveStatus === 'saved' && <CheckCircle className="w-3 h-3" />}

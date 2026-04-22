@@ -68,7 +68,7 @@ interface BottomTabBarProps {
 export function BottomTabBar({ tabs }: BottomTabBarProps) {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex z-40"
+      className="fixed bottom-0 left-0 right-0 bg-background border-t border-border flex z-40"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       aria-label="Primary navigation"
     >
@@ -79,8 +79,8 @@ export function BottomTabBar({ tabs }: BottomTabBarProps) {
           className={({ isActive }) =>
             `flex flex-col items-center justify-center flex-1 gap-0.5 text-xs font-medium transition-colors min-h-[44px] min-w-[44px] py-2 px-1 ${
               isActive
-                ? 'text-indigo-600'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'text-primary'
+                : 'text-muted-foreground hover:text-text'
             }`
           }
           aria-label={tab.label}

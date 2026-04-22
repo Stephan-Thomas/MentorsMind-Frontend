@@ -4,26 +4,39 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-        },
         stellar: {
           light: '#7B61FF',
           DEFAULT: '#5B3FFF',
           dark: '#3B1FDF',
-        }
+        },
+        background:  'var(--color-background)',
+        surface:     'var(--color-surface)',
+        border:      'var(--color-border)',
+        primary: {
+          DEFAULT:    'var(--color-primary)',
+          foreground: 'var(--color-primary-foreground)',
+        },
+        secondary: {
+          DEFAULT:    'var(--color-secondary)',
+          foreground: 'var(--color-secondary-foreground)',
+        },
+        muted: {
+          DEFAULT:    'var(--color-muted)',
+          foreground: 'var(--color-muted-foreground)',
+        },
+        accent: {
+          DEFAULT:    'var(--color-accent)',
+          foreground: 'var(--color-accent-foreground)',
+        },
+        destructive: {
+          DEFAULT:    'var(--color-destructive)',
+          foreground: 'var(--color-destructive-foreground)',
+        },
+        text:        'var(--color-text)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

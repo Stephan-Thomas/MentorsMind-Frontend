@@ -14,11 +14,11 @@ export const PermissionBanner: React.FC<PermissionBannerProps> = ({
   error,
 }) => {
   return (
-    <div className="sticky top-0 z-50 w-full border-b border-blue-200 bg-blue-50 px-4 py-3">
+    <div className="sticky top-0 z-50 w-full border-b border-primary/20 bg-accent px-4 py-3">
       <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         {/* Icon + text */}
         <div className="flex items-start gap-3 sm:items-center">
-          <span className="mt-0.5 text-blue-600 sm:mt-0" aria-hidden="true">
+          <span className="mt-0.5 text-primary sm:mt-0" aria-hidden="true">
             {/* Bell icon */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -34,7 +34,7 @@ export const PermissionBanner: React.FC<PermissionBannerProps> = ({
               />
             </svg>
           </span>
-          <p className="text-sm text-slate-700">
+          <p className="text-sm text-text">
             Stay up to date — enable push notifications to get session reminders and important updates.
           </p>
         </div>
@@ -44,7 +44,7 @@ export const PermissionBanner: React.FC<PermissionBannerProps> = ({
           <button
             onClick={onEnable}
             disabled={isLoading}
-            className="flex items-center gap-1.5 rounded-full bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLoading && (
               <svg
@@ -73,7 +73,7 @@ export const PermissionBanner: React.FC<PermissionBannerProps> = ({
           </button>
           <button
             onClick={onDismiss}
-            className="rounded-full border border-slate-300 px-4 py-1.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+            className="rounded-full border border-border px-4 py-1.5 text-sm font-semibold text-muted-foreground transition hover:bg-surface"
           >
             Not now
           </button>
@@ -83,7 +83,7 @@ export const PermissionBanner: React.FC<PermissionBannerProps> = ({
       {/* Inline error */}
       {error && (
         <div className="mx-auto mt-2 max-w-5xl pl-8 sm:pl-0">
-          <p className="text-xs text-red-600">{error}</p>
+          <p className="text-xs text-destructive">{error}</p>
         </div>
       )}
     </div>

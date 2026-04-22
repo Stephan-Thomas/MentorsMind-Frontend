@@ -107,13 +107,13 @@ export function HamburgerDrawer({ isOpen, onClose, secondaryNavItems }: Hamburge
 
       {/* Drawer panel */}
       <div
-        className="fixed inset-y-0 left-0 z-50 w-72 bg-white flex flex-col shadow-xl"
+        className="fixed inset-y-0 left-0 z-50 w-72 bg-background flex flex-col shadow-xl"
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
       >
         {/* User info header */}
-        <div className="flex items-center gap-3 px-5 py-6 border-b border-gray-100">
+        <div className="flex items-center gap-3 px-5 py-6 border-b border-border">
           {user?.avatarUrl ? (
             <img
               src={user.avatarUrl}
@@ -121,14 +121,14 @@ export function HamburgerDrawer({ isOpen, onClose, secondaryNavItems }: Hamburge
               className="w-11 h-11 rounded-full object-cover flex-shrink-0"
             />
           ) : (
-            <div className="w-11 h-11 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 text-indigo-600 font-semibold text-lg">
+            <div className="w-11 h-11 rounded-full bg-accent flex items-center justify-center flex-shrink-0 text-accent-foreground font-semibold text-lg">
               {displayName ? displayName.charAt(0).toUpperCase() : '?'}
             </div>
           )}
           <div className="min-w-0">
-            <p className="font-semibold text-gray-900 truncate">{displayName || 'User'}</p>
+            <p className="font-semibold text-text truncate">{displayName || 'User'}</p>
             {roleLabel && (
-              <p className="text-xs text-gray-500 capitalize">{roleLabel}</p>
+              <p className="text-xs text-muted-foreground capitalize">{roleLabel}</p>
             )}
           </div>
         </div>
@@ -143,8 +143,8 @@ export function HamburgerDrawer({ isOpen, onClose, secondaryNavItems }: Hamburge
               className={({ isActive }) =>
                 `flex items-center gap-3 px-5 min-h-[44px] text-sm font-medium transition-colors ${
                   isActive
-                    ? 'text-indigo-600 bg-indigo-50'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'text-primary bg-accent'
+                    : 'text-text hover:bg-surface hover:text-text'
                 }`
               }
             >
