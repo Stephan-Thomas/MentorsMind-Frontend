@@ -15,6 +15,7 @@ import LearnerDashboard from './pages/LearnerDashboard';
 import LearnerProfile from './pages/LearnerProfile';
 import LearnerOnboarding from './pages/LearnerOnboarding';
 import SessionHistory from './pages/SessionHistory';
+import SessionDetailPage from './pages/SessionDetailPage';
 import PaymentHistory from './pages/PaymentHistory';
 
 export default function App() {
@@ -36,13 +37,16 @@ export default function App() {
             <Route path="/mentor/profile" element={<ProtectedRoute><DashboardLayout><MentorProfile /></DashboardLayout></ProtectedRoute>} />
             <Route path="/mentor/wallet" element={<ProtectedRoute><DashboardLayout><MentorWallet /></DashboardLayout></ProtectedRoute>} />
             <Route path="/mentor/sessions" element={<ProtectedRoute><DashboardLayout><SessionHistory /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/mentor/sessions/:sessionId" element={<ProtectedRoute><DashboardLayout><SessionDetailPage /></DashboardLayout></ProtectedRoute>} />
 
             {/* Learner routes */}
             <Route path="/learner" element={<ProtectedRoute><DashboardLayout><Navigate to="/learner/dashboard" replace /></DashboardLayout></ProtectedRoute>} />
             <Route path="/learner/dashboard" element={<ProtectedRoute><DashboardLayout><LearnerDashboard /></DashboardLayout></ProtectedRoute>} />
             <Route path="/learner/profile" element={<ProtectedRoute><DashboardLayout><LearnerProfile /></DashboardLayout></ProtectedRoute>} />
             <Route path="/learner/sessions" element={<ProtectedRoute><DashboardLayout><SessionHistory /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/learner/sessions/:sessionId" element={<ProtectedRoute><DashboardLayout><SessionDetailPage /></DashboardLayout></ProtectedRoute>} />
             <Route path="/learner/payments" element={<ProtectedRoute><DashboardLayout><PaymentHistory /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/sessions/:sessionId" element={<ProtectedRoute><DashboardLayout><SessionDetailPage /></DashboardLayout></ProtectedRoute>} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />

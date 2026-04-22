@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Star, CheckCircle } from 'lucide-react';
-import type { SessionHistoryItem } from '../../types';
+import type { SessionHistoryItem } from '../../types/session.types';
 import { SkillTagSelector } from '../mentor/SkillTagSelector';
 
 const SKILL_SUGGESTIONS = [
