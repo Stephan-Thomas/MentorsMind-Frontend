@@ -21,6 +21,7 @@ export type PaymentStep = 'connect' | 'method' | 'review' | 'processing' | 'succ
 export interface PaymentState {
   step: PaymentStep;
   selectedAsset: StellarAssetCode;
+  isSubmitting: boolean;
   transactionHash?: string;
   error?: string;
 }
