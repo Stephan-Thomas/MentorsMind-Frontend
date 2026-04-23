@@ -10,8 +10,12 @@ export interface MFAPendingState {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isAuthenticated: boolean;
+  isLoading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  mfaPending: MFAPendingState | null;
+  login: (email: string, password: string) => Promise<{ mfaRequired: boolean }>;
+  completeMFAChallenge: (totp: string) => Promise<void>;
   register: (firstName: string, lastName: string, email: string, password: string, role: 'mentor' | 'learner') => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
@@ -128,7 +132,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, mfaPending, login, completeMFAChallenge, register, logout, clearError, refreshUser }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      isAuthenticated: !!user,
+      isLoading: loading,
+      error, 
+      mfaPending, 
+      login, 
+      completeMFAChallenge, 
+      register, 
+      logout, 
+      clearError, 
+      refreshUser 
+    }}>
       {children}
     </AuthContext.Provider>
   );
