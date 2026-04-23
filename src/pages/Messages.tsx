@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMessages } from '../hooks/useMessages';
 import ConversationList from '../components/messaging/ConversationList';
 import MessageThread from '../components/messaging/MessageThread';
 import MessageInput from '../components/messaging/MessageInput';
-import EmptyState from '../components/ui/EmptyState';
+import { SkeletonCard } from '../components/animations/SkeletonLoader';
+import { useMinimumLoading } from '../hooks/useMinimumLoading';
 
 const Messages: React.FC = () => {
   const {
@@ -14,6 +15,7 @@ const Messages: React.FC = () => {
     totalUnreadCount,
     searchQuery,
     searchResults,
+    isLoading: messagesLoading,
     selectConversation,
     sendMessage,
     searchMessages,
@@ -21,7 +23,14 @@ const Messages: React.FC = () => {
     createConversation,
   } = useMessages();
 
-  const [isMobileView, setIsMobileView] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const showSkeleton = useMinimumLoading(isLoading || messagesLoading, 300);
 
   const displayMessages = searchResults.length > 0 ? searchResults : activeMessages;
 
@@ -41,13 +50,16 @@ const Messages: React.FC = () => {
           <div className="grid md:grid-cols-[380px_1fr] h-[calc(100vh-220px)]">
             {/* Conversation List */}
             <div className={`border-r border-gray-100 ${activeConversationId ? 'hidden md:block' : 'block'}`}>
-              {conversations.length === 0 ? (
-                <EmptyState
-                  title="No conversations"
-                  description="You have no conversations yet. Start a chat with a mentor to get help."
-                  ctaLabel="Start a conversation"
-                  onCta={() => createConversation('mentor-demo', 'Mentor Demo')}
-                />
+              {showSkeleton ? (
+                <div className="flex flex-col h-full">
+                  <div className="p-4 border-b border-gray-100">
+                    <div className="h-6 w-24 bg-gray-100 rounded animate-pulse mb-2" />
+                    <div className="h-4 w-32 bg-gray-50 rounded animate-pulse" />
+                  </div>
+                  <div className="flex-1 overflow-y-auto">
+                    {[1, 2, 3, 4, 5].map(i => <SkeletonCard key={i} variant="message" />)}
+                  </div>
+                </div>
               ) : (
                 <ConversationList
                   conversations={conversations}
