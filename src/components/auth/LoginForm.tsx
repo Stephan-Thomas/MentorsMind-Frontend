@@ -3,12 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Fingerprint, Loader2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { usePasskey } from '../../hooks/usePasskey';
+import { TOKEN_KEY, REFRESH_TOKEN } from '../../config/app.config';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 import Alert from '../ui/Alert';
 
 export default function LoginForm() {
-  const { login } = useAuth();
+  const { login, error: authError, clearError } = useAuth();
   const navigate = useNavigate();
   const { isSupported, checkingSupport, authenticate, status: passkeyStatus, error: passkeyError, clearError: clearPasskeyError } = usePasskey();
 
@@ -21,6 +22,7 @@ export default function LoginForm() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    clearError();
     clearPasskeyError();
     if (!email || !password) { setError('Please fill in all fields.'); return; }
     setLoading(true);
@@ -32,7 +34,7 @@ export default function LoginForm() {
         navigate('/learner/dashboard');
       }
     } catch {
-      setError('Invalid email or password.');
+      // Error is already set in context, just handle navigation
     } finally {
       setLoading(false);
     }
@@ -46,15 +48,15 @@ export default function LoginForm() {
     if (result) {
       // Persist session the same way the password login does via AuthContext
       localStorage.setItem('mm_user', JSON.stringify(result.user));
-      localStorage.setItem('mm_token', result.token);
-      localStorage.setItem('mm_refresh_token', result.refreshToken);
+      localStorage.setItem(TOKEN_KEY, result.token);
+      localStorage.setItem(REFRESH_TOKEN, result.refreshToken);
       // Force a full reload so AuthContext picks up the new session
       window.location.replace('/learner/dashboard');
     }
   };
 
   const passkeyLoading = passkeyStatus === 'loading';
-  const displayError = error || passkeyError || '';
+  const displayError = error || authError || passkeyError || '';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface px-4">
