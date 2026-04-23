@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import MentorCard from '../components/mentor/MentorCard';
 import PaymentModal from '../components/payment/PaymentModal';
 import Input from '../components/ui/Input';
-import Badge from '../components/ui/Badge';
+import { SkeletonCard } from '../components/animations/SkeletonLoader';
+import { useMinimumLoading } from '../hooks/useMinimumLoading';
 import type { Mentor } from '../types';
 
 // Mock data
@@ -20,6 +21,15 @@ export default function MentorSearch() {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [maxPrice, setMaxPrice] = useState('');
   const [bookingMentor, setBookingMentor] = useState<Mentor | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate API load
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const showSkeleton = useMinimumLoading(isLoading, 300);
 
   const toggleSkill = (s: string) =>
     setSelectedSkills(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
@@ -58,8 +68,17 @@ export default function MentorSearch() {
 
       {/* Results */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <p className="text-sm text-gray-500 mb-6">{filtered.length} mentor{filtered.length !== 1 ? 's' : ''} found</p>
-        {filtered.length === 0 ? (
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-sm text-gray-500">
+            {showSkeleton ? 'Searching for mentors...' : `${filtered.length} mentor${filtered.length !== 1 ? 's' : ''} found`}
+          </p>
+        </div>
+
+        {showSkeleton ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map(i => <SkeletonCard key={i} variant="mentor" />)}
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="text-center py-16 text-gray-400">
             <p className="text-5xl mb-4">🔍</p>
             <p className="text-lg font-medium">No mentors found</p>
