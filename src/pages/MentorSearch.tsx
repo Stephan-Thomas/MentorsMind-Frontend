@@ -1,79 +1,235 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import MentorCard from '../components/mentor/MentorCard';
-import PaymentModal from '../components/payment/PaymentModal';
+import BookingModal from '../components/learner/BookingModal';
+import MentorFilterSidebar, { type MentorFilters } from '../components/search/MentorFilterSidebar';
+import MentorCardSkeleton from '../components/search/MentorCardSkeleton';
 import Input from '../components/ui/Input';
-import Badge from '../components/ui/Badge';
 import type { Mentor } from '../types';
+import { searchMentors, type MentorSearchParams } from '../services/mentor.service';
 
-// Mock data
-const MOCK_MENTORS: Mentor[] = [
-  { id: '1', email: 'alice@example.com', name: 'Alice Chen', role: 'mentor', bio: 'Senior Rust & Blockchain engineer with 8 years experience. Soroban smart contract specialist.', skills: ['Rust', 'Soroban', 'Stellar', 'WebAssembly'], hourlyRate: 120, currency: 'USDC', rating: 4.9, reviewCount: 87, sessionCount: 312, isVerified: true, timezone: 'UTC-8', languages: ['English', 'Mandarin'], createdAt: '' },
-  { id: '2', email: 'bob@example.com', name: 'Bob Martinez', role: 'mentor', bio: 'Full-stack developer specializing in React, TypeScript, and Node.js. 6 years building production apps.', skills: ['React', 'TypeScript', 'Node.js', 'PostgreSQL'], hourlyRate: 90, currency: 'XLM', rating: 4.7, reviewCount: 54, sessionCount: 198, isVerified: true, timezone: 'UTC-5', languages: ['English', 'Spanish'], createdAt: '' },
-  { id: '3', email: 'priya@example.com', name: 'Priya Sharma', role: 'mentor', bio: 'Machine learning engineer at a top AI lab. Expert in Python, TensorFlow, and data science.', skills: ['Python', 'TensorFlow', 'ML', 'Data Science'], hourlyRate: 150, currency: 'USDC', rating: 5.0, reviewCount: 32, sessionCount: 145, isVerified: true, timezone: 'UTC+5:30', languages: ['English', 'Hindi'], createdAt: '' },
-  { id: '4', email: 'james@example.com', name: 'James Okafor', role: 'mentor', bio: 'DevOps and cloud architect. AWS certified. Kubernetes, Docker, and CI/CD expert.', skills: ['AWS', 'Kubernetes', 'Docker', 'DevOps'], hourlyRate: 110, currency: 'USDC', rating: 4.8, reviewCount: 61, sessionCount: 220, isVerified: false, timezone: 'UTC+1', languages: ['English'], createdAt: '' },
+const ALL_SKILLS = [
+  'Rust',
+  'React',
+  'TypeScript',
+  'Python',
+  'Soroban',
+  'Stellar',
+  'Node.js',
+  'AWS',
+  'ML',
+  'Docker',
+  'Kubernetes',
+  'PostgreSQL',
+  'TensorFlow',
+  'Data Science',
+  'DevOps',
+  'WebAssembly',
 ];
 
-const ALL_SKILLS = ['Rust', 'React', 'TypeScript', 'Python', 'Soroban', 'Stellar', 'Node.js', 'AWS', 'ML', 'Docker'];
+const ITEMS_PER_PAGE = 12;
 
 export default function MentorSearch() {
-  const [query, setQuery] = useState('');
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [maxPrice, setMaxPrice] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get('q') || '');
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const [bookingMentor, setBookingMentor] = useState<Mentor | null>(null);
-
-  const toggleSkill = (s: string) =>
-    setSelectedSkills(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
-
-  const filtered = MOCK_MENTORS.filter(m => {
-    const matchQuery = !query || m.name.toLowerCase().includes(query.toLowerCase()) || m.skills.some(s => s.toLowerCase().includes(query.toLowerCase()));
-    const matchSkills = selectedSkills.length === 0 || selectedSkills.every(s => m.skills.includes(s));
-    const matchPrice = !maxPrice || m.hourlyRate <= Number(maxPrice);
-    return matchQuery && matchSkills && matchPrice;
+  const [filters, setFilters] = useState<MentorFilters>({
+    skills: searchParams.get('skills')?.split(',').filter(Boolean) || [],
+    minPrice: Number(searchParams.get('minPrice')) || 0,
+    maxPrice: Number(searchParams.get('maxPrice')) || 500,
+    minRating: Number(searchParams.get('minRating')) || 0,
+    availableOnly: searchParams.get('available') === 'true',
   });
+
+  const fetchMentors = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params: MentorSearchParams = {
+        q: query || undefined,
+        skills: filters.skills.length > 0 ? filters.skills.join(',') : undefined,
+        minPrice: filters.minPrice > 0 ? filters.minPrice : undefined,
+        maxPrice: filters.maxPrice < 500 ? filters.maxPrice : undefined,
+        minRating: filters.minRating > 0 ? filters.minRating : undefined,
+        page,
+        limit: ITEMS_PER_PAGE,
+      };
+
+      const result = await searchMentors(params);
+      setMentors(result.mentors);
+      setTotal(result.total);
+    } catch (error) {
+      console.error('Failed to fetch mentors:', error);
+      setMentors([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [query, filters, page]);
+
+  useEffect(() => {
+    fetchMentors();
+  }, [fetchMentors]);
+
+  useEffect(() => {
+    // Update URL params when filters change
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (filters.skills.length > 0) params.set('skills', filters.skills.join(','));
+    if (filters.minPrice > 0) params.set('minPrice', filters.minPrice.toString());
+    if (filters.maxPrice < 500) params.set('maxPrice', filters.maxPrice.toString());
+    if (filters.minRating > 0) params.set('minRating', filters.minRating.toString());
+    if (filters.availableOnly) params.set('available', 'true');
+    if (page > 1) params.set('page', page.toString());
+    setSearchParams(params, { replace: true });
+  }, [query, filters, page, setSearchParams]);
+
+  const handleSearch = (value: string) => {
+    setQuery(value);
+    setPage(1);
+  };
+
+  const handleFiltersChange = (newFilters: MentorFilters) => {
+    setFilters(newFilters);
+    setPage(1);
+  };
+
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 py-8 px-4">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Find a Mentor</h1>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <Input placeholder="Search by name or skill..." value={query} onChange={e => setQuery(e.target.value)} />
+              <Input
+                placeholder="Search by name or skill..."
+                value={query}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
             </div>
-            <Input placeholder="Max price (per hour)" type="number" value={maxPrice} onChange={e => setMaxPrice(e.target.value)} className="md:w-48" />
-          </div>
-          {/* Skill filters */}
-          <div className="flex flex-wrap gap-2 mt-4">
-            {ALL_SKILLS.map(s => (
-              <button key={s} onClick={() => toggleSkill(s)}
-                className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors
-                  ${selectedSkills.includes(s) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'}`}>
-                {s}
-              </button>
-            ))}
           </div>
         </div>
       </div>
 
-      {/* Results */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <p className="text-sm text-gray-500 mb-6">{filtered.length} mentor{filtered.length !== 1 ? 's' : ''} found</p>
-        {filtered.length === 0 ? (
-          <div className="text-center py-16 text-gray-400">
-            <p className="text-5xl mb-4">🔍</p>
-            <p className="text-lg font-medium">No mentors found</p>
-            <p className="text-sm mt-1">Try adjusting your filters</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map(m => <MentorCard key={m.id} mentor={m} onBook={setBookingMentor} />)}
-          </div>
-        )}
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+          {/* Sidebar Filters */}
+          <aside className="lg:block">
+            <MentorFilterSidebar
+              filters={filters}
+              onFiltersChange={handleFiltersChange}
+              availableSkills={ALL_SKILLS}
+            />
+          </aside>
+
+          {/* Results */}
+          <main>
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-sm text-gray-500">
+                {loading ? (
+                  'Searching...'
+                ) : (
+                  <>
+                    {total} mentor{total !== 1 ? 's' : ''} found
+                    {page > 1 && ` (page ${page} of ${totalPages})`}
+                  </>
+                )}
+              </p>
+            </div>
+
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <MentorCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : mentors.length === 0 ? (
+              <div className="text-center py-16 text-gray-400">
+                <p className="text-5xl mb-4">🔍</p>
+                <p className="text-lg font-medium">No mentors found</p>
+                <p className="text-sm mt-1">Try adjusting your filters</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {mentors.map((m) => (
+                    <MentorCard key={m.id} mentor={m} onBook={setBookingMentor} />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-8">
+                    <button
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                    <div className="flex items-center gap-1">
+                      {[...Array(totalPages)].map((_, i) => {
+                        const pageNum = i + 1;
+                        // Show first, last, current, and adjacent pages
+                        if (
+                          pageNum === 1 ||
+                          pageNum === totalPages ||
+                          Math.abs(pageNum - page) <= 1
+                        ) {
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => setPage(pageNum)}
+                              className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                                page === pageNum
+                                  ? 'bg-indigo-600 text-white'
+                                  : 'text-gray-700 hover:bg-gray-100'
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        } else if (
+                          pageNum === page - 2 ||
+                          pageNum === page + 2
+                        ) {
+                          return (
+                            <span key={pageNum} className="px-2 text-gray-400">
+                              ...
+                            </span>
+                          );
+                        }
+                        return null;
+                      })}
+                    </div>
+                    <button
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={page === totalPages}
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </main>
+        </div>
       </div>
 
       {bookingMentor && (
-        <PaymentModal isOpen={!!bookingMentor} onClose={() => setBookingMentor(null)} mentor={bookingMentor} sessionDuration={60} />
+        <BookingModal
+          isOpen={!!bookingMentor}
+          onClose={() => setBookingMentor(null)}
+          mentor={bookingMentor as any}
+        />
       )}
     </div>
   );
