@@ -109,20 +109,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse })
 
   return (
     <aside
-      className={`flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-200 shrink-0 ${
+      className={`flex flex-col bg-background border-r border-border transition-all duration-200 shrink-0 ${
         collapsed ? 'w-16' : 'w-60'
       }`}
       data-testid="sidebar"
     >
       {/* Logo + collapse toggle */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-gray-100 dark:border-gray-800">
+      <div className="flex items-center justify-between h-16 px-4 border-b border-border">
         {!collapsed && (
-          <span className="font-bold text-indigo-600 truncate">⭐ MentorMinds</span>
+          <span className="font-bold text-primary truncate">⭐ MentorMinds</span>
         )}
         <button
           onClick={onToggleCollapse}
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 ml-auto min-w-[44px] min-h-[44px] flex items-center justify-center"
+          className="p-2 rounded-lg hover:bg-surface text-muted-foreground ml-auto min-w-[44px] min-h-[44px] flex items-center justify-center"
           data-testid="sidebar-collapse-toggle"
         >
           <svg
@@ -137,15 +137,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse })
       </div>
 
       {/* User identity */}
-      <div className={`px-3 py-4 border-b border-gray-100 dark:border-gray-800 ${collapsed ? 'flex justify-center' : ''}`}>
+      <div className={`px-3 py-4 border-b border-border ${collapsed ? 'flex justify-center' : ''}`}>
         {isLoading ? (
           /* Skeleton placeholder */
           <div className="flex items-center gap-3" data-testid="sidebar-skeleton">
-            <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse shrink-0" />
+            <div className="w-9 h-9 rounded-full bg-surface animate-pulse shrink-0" />
             {!collapsed && (
               <div className="flex-1 space-y-1.5">
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-24" />
-                <div className="h-2.5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-16" />
+                <div className="h-3 bg-surface rounded animate-pulse w-24" />
+                <div className="h-2.5 bg-surface rounded animate-pulse w-16" />
               </div>
             )}
           </div>
@@ -161,7 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse })
               />
             ) : (
               <div
-                className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold text-sm shrink-0"
+                className="w-9 h-9 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-bold text-sm shrink-0"
                 data-testid="sidebar-avatar-fallback"
               >
                 {user?.name?.[0]?.toUpperCase() ?? '?'}
@@ -169,10 +169,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse })
             )}
             {!collapsed && (
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate" data-testid="sidebar-display-name">
+                <p className="text-sm font-medium text-text truncate" data-testid="sidebar-display-name">
                   {user?.name}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 capitalize" data-testid="sidebar-role-label">
+                <p className="text-xs text-muted-foreground capitalize" data-testid="sidebar-role-label">
                   {user?.role}
                 </p>
               </div>
@@ -183,18 +183,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse })
 
       {/* Quick stats */}
       {!collapsed && (
-        <div className="px-3 py-3 border-b border-gray-100 dark:border-gray-800" data-testid="sidebar-quick-stats">
-          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">
+        <div className="px-3 py-3 border-b border-border" data-testid="sidebar-quick-stats">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
             Quick Stats
           </p>
           <div className="space-y-1">
-            <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>Upcoming Sessions</span>
-              <span className="font-semibold text-indigo-600 dark:text-indigo-400" data-testid="stat-upcoming-sessions">0</span>
+              <span className="font-semibold text-primary" data-testid="stat-upcoming-sessions">0</span>
             </div>
-            <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>Unread Messages</span>
-              <span className="font-semibold text-indigo-600 dark:text-indigo-400" data-testid="stat-unread-messages">0</span>
+              <span className="font-semibold text-primary" data-testid="stat-unread-messages">0</span>
             </div>
           </div>
         </div>
@@ -212,8 +212,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse })
               className={({ isActive: navActive }) =>
                 `relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
                   navActive || isActive
-                    ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground hover:bg-surface hover:text-text'
                 } ${collapsed ? 'justify-center' : ''}`
               }
               data-testid={`nav-item-${item.id}`}
@@ -222,7 +222,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse })
                 <>
                   {/* Active indicator bar */}
                   {(navActive || isActive) && !collapsed && (
-                    <span className="absolute left-0 w-1 h-6 bg-indigo-600 rounded-r-full" aria-hidden="true" />
+                    <span className="absolute left-0 w-1 h-6 bg-primary rounded-r-full" aria-hidden="true" />
                   )}
                   <svg
                     className="w-5 h-5 shrink-0"
